@@ -188,13 +188,13 @@
     font-family: Inter, "Segoe UI", Arial, sans-serif;
     font-weight: 600;
     font-size: 14px;
-    padding: 10px; /* Padding igualado para que el botón se vea cuadradito */
+    padding: 10px;
     background-color: #ffffff;
     border: 1px solid #d9e1ea;
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(24, 32, 47, 0.08);
-    transition: all 0.3s ease; /* Transición suave */
-    overflow: hidden; /* Oculta lo que sobresale */
+    transition: all 0.3s ease;
+    overflow: hidden;
     }
 
     .btn-volver:hover {
@@ -202,44 +202,37 @@
         border-color: #124b68;
         transform: translateY(-2px);
         box-shadow: 0 8px 20px rgba(18, 75, 104, 0.15);
-        padding: 10px 16px; /* Al expandirse, recupera el padding horizontal */
+        padding: 10px 16px;
     }
 
-    /* Estado inicial del texto: Oculto y sin ancho */
     .btn-texto {
         max-width: 0;
         opacity: 0;
         margin-left: 0;
-        white-space: nowrap; /* Evita que el texto salte de línea al animarse */
-        transition: all 0.3s ease; /* Misma duración que el hover del botón */
+        white-space: nowrap;
+        transition: all 0.3s ease;
     }
 
-    /* Estado al hacer hover: Aparece el texto y se separa del ícono */
     .btn-volver:hover .btn-texto {
-        max-width: 150px; /* Espacio suficiente para "Volver al Menú" */
+        max-width: 150px;
         opacity: 1;
-        margin-left: 8px; /* Esto reemplaza el antiguo 'gap' */
+        margin-left: 8px;
     }
 
   </style>
 </head>
 <body>
 
-  
-
-
   <header>
     <div class="top">
 
       <a href="../index.html" class="btn-volver">
-          <!-- Ícono de flecha SVG -->
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="19" y1="12" x2="5" y2="12"></line>
               <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
           <span class="btn-texto">Volver al Menú</span>
       </a>
-
 
       <div>
         <h1>Modulo 0 - Practica rapida</h1>
@@ -286,7 +279,6 @@
         </div>
       </div>
       
-      <!-- Zona de respuesta REESTRUCTURADA -->
       <div class="answer-zone">
         <div id="livePreview"></div>
         <textarea id="answerInput" rows="3" placeholder="Ej: 3/4, x**2+1, sqrt(2), q=x+1; r=2"></textarea>
@@ -340,7 +332,10 @@
   };
   const esc = v => String(v ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
   
-  const API_BASE = "http://127.0.0.1:8765";
+  // URL dinámica: usa localhost si pruebas localmente, o Render con el prefijo /m0 en producción
+  const API_BASE = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+    ? "http://127.0.0.1:8000/m0"
+    : "https://prueba-integral-1.onrender.com/m0";
   
   const apiUrl = path => API_BASE ? `${API_BASE}${path}` : path;
   async function api(path, body=null) {
