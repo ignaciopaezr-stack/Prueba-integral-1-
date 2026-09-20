@@ -1,4 +1,5 @@
 flask
+flask-cors
 sympy
 reportlab
 matplotlib
@@ -6,4 +7,3 @@ numpy
 pillow
 colorama
 fpdf
-dotenv
