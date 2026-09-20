@@ -16,12 +16,7 @@
   <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
 
   <style>
-    /* =====================================================================
-    TEOREMA · Calculadora Graficadora — style.css
-    ===================================================================== */
-
     :root {
-      /* — Tokens heredados de frontend1.html — */
       --ink: #18202f;
       --muted: #667085;
       --panel: #ffffff;
@@ -36,7 +31,6 @@
       --radius-md: 12px;
       --radius-sm: 8px;
 
-      /* — Paleta para funciones simultáneas f1(x), f2(x)... — */
       --fn-0: var(--brand);
       --fn-1: var(--accent);
       --fn-2: var(--good);
@@ -70,7 +64,6 @@
     button, select, input, textarea { font: inherit; }
     :focus-visible { outline: 3px solid rgba(18,75,104,.35); outline-offset: 1px; }
 
-    /* ── BARRA SUPERIOR ─────────────────────────────────────────────────── */
     .topbar {
       background: linear-gradient(135deg, #0f172a, #124b68 55%, #0b6b6f);
       color: #fff;
@@ -103,22 +96,6 @@
     .icon-btn:hover { transform: translateY(-1px); background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.5); }
     .icon-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; }
 
-    .back-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      border: 1px solid rgba(255,255,255,.28);
-      background: rgba(255,255,255,.08);
-      color: #fff;
-      border-radius: 10px;
-      padding: 8px 12px;
-      font-size: 13px; font-weight: 700;
-      cursor: pointer;
-      transition: transform .12s, background .12s;
-      text-decoration: none;
-      flex: none;
-    }
-    .back-btn:hover { transform: translateY(-1px); background: rgba(255,255,255,.18); }
-
-    /* ── LAYOUT PRINCIPAL ───────────────────────────────────────────────── */
     main.app {
       max-width: 1420px;
       margin: 0 auto;
@@ -162,7 +139,6 @@
     }
     .pill.pill-live { color: var(--brand); border-color: var(--brand); background: #eaf3fb; }
 
-    /* ── BOTONES BASE (heredado) ────────────────────────────────────────── */
     button {
       border: 1px solid var(--line);
       background: var(--panel);
@@ -181,7 +157,6 @@
     button.good    { background: #ecfdf3; color: var(--good); border-color: #abd9bf; font-weight: 800; }
     button.danger  { background: #fff1f0; color: var(--bad); border-color: #f4b8b2; font-weight: 800; }
 
-   /* ── PANEL IZQUIERDO: CALCULADORA CIENTÍFICA ────────────────────────── */
     .calc-panel { 
       padding: 14px; 
       display: flex; 
@@ -244,8 +219,6 @@
     .keypad-grid.cols-5 { grid-template-columns: repeat(5, 1fr); }
     .keypad-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
     .keypad-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
-    .keypad-row-compact { display: flex; gap: 7px; }
-    .keypad-row-compact .keypad-group { flex: 1; }
 
     .key {
       min-height: 28px;
@@ -269,7 +242,6 @@
     .result-box .result-exact { font-size: 12.5px; color: var(--muted); font-weight: 600; }
     .result-box.result-error .result-decimal { color: var(--bad); font-size: 14px; font-weight: 700; }
 
-    /* ── PANEL DERECHO: GRÁFICA ──────────────────────────────────────────── */
     .graph-col { display: grid; gap: 16px; min-width: 0; }
     .graph-panel { padding: 14px; display: grid; gap: 10px; min-width: 0; }
     .graph-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
@@ -293,7 +265,6 @@
       padding: 24px;
     }
 
-    /* ── PESTAÑAS: FUNCIONES / HISTORIAL ────────────────────────────────── */
     .tabs-panel { padding: 0; overflow: hidden; }
     .tabs-head { display: flex; border-bottom: 1px solid var(--line); }
     .tab-btn {
@@ -345,7 +316,6 @@
 
     .empty-note { color: var(--muted); font-size: 12.5px; text-align: center; padding: 14px 8px; }
 
-    /* ── TOASTS / ERRORES ELEGANTES ─────────────────────────────────────── */
     #toastStack { position: fixed; right: 16px; bottom: 16px; display: grid; gap: 8px; z-index: 60; max-width: min(360px, calc(100vw - 32px)); }
     .toast {
       background: var(--ink); color: #fff;
@@ -359,7 +329,6 @@
     .toast.toast-ok { background: #ecfdf3; color: var(--good); border: 1px solid #abd9bf; }
     @keyframes toast-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* ── MODALES (Ajustes / Ayuda) ──────────────────────────────────────── */
     .modal-backdrop {
       position: fixed; inset: 0; background: rgba(15,23,42,.45);
       display: none; align-items: center; justify-content: center; padding: 20px; z-index: 70;
@@ -381,11 +350,9 @@
     .modal-close-row { display: flex; justify-content: flex-end; margin-top: 6px; }
     .help-list { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.7; color: var(--ink); }
 
-    /* ── LOADING ─────────────────────────────────────────────────────────── */
     .spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(18,75,104,.25); border-top-color: var(--brand); animation: spin .7s linear infinite; display: inline-block; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── RESPONSIVE ──────────────────────────────────────────────────────── */
     @media (max-width: 980px) {
       main.app { grid-template-columns: 1fr; }
       .calc-panel { order: 2; }
@@ -397,27 +364,26 @@
       .topbar-titles .subtitle { display: none; }
     }
 
-    /* ── OCULTAR BOTÓN IGUAL Y CAJA DE RESULTADOS ── */
     #equalsBtn, 
     #resultBox {
       display: none !important;
     }
 
     .btn-volver {
-    display: inline-flex;
-    align-items: center;
-    text-decoration: none;
-    color: #124b68;
-    font-family: Inter, "Segoe UI", Arial, sans-serif;
-    font-weight: 600;
-    font-size: 14px;
-    padding: 10px; /* Padding igualado para que el botón se vea cuadradito */
-    background-color: #ffffff;
-    border: 1px solid #d9e1ea;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(24, 32, 47, 0.08);
-    transition: all 0.3s ease; /* Transición suave */
-    overflow: hidden; /* Oculta lo que sobresale */
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      color: #124b68;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 10px;
+      background-color: #ffffff;
+      border: 1px solid #d9e1ea;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(24, 32, 47, 0.08);
+      transition: all 0.3s ease;
+      overflow: hidden;
     }
 
     .btn-volver:hover {
@@ -425,23 +391,21 @@
         border-color: #124b68;
         transform: translateY(-2px);
         box-shadow: 0 8px 20px rgba(18, 75, 104, 0.15);
-        padding: 10px 16px; /* Al expandirse, recupera el padding horizontal */
+        padding: 10px 16px;
     }
 
-    /* Estado inicial del texto: Oculto y sin ancho */
     .btn-texto {
         max-width: 0;
         opacity: 0;
         margin-left: 0;
-        white-space: nowrap; /* Evita que el texto salte de línea al animarse */
-        transition: all 0.3s ease; /* Misma duración que el hover del botón */
+        white-space: nowrap;
+        transition: all 0.3s ease;
     }
 
-    /* Estado al hacer hover: Aparece el texto y se separa del ícono */
     .btn-volver:hover .btn-texto {
-        max-width: 150px; /* Espacio suficiente para "Volver al Menú" */
+        max-width: 150px;
         opacity: 1;
-        margin-left: 8px; /* Esto reemplaza el antiguo 'gap' */
+        margin-left: 8px;
     }
   </style>
 </head>
@@ -449,15 +413,13 @@
 <body>
   <header class="topbar">
     <div class="topbar-left">
-      
-        <a href="../index.html" class="btn-volver">
-            <!-- Ícono de flecha SVG -->
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="19" y1="12" x2="5" y2="12"></line>
-                <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-            <span class="btn-texto">Volver al Menú</span>
-        </a>
+      <a href="../index.html" class="btn-volver">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span class="btn-texto">Volver al Menú</span>
+      </a>
 
       <div class="topbar-titles">
         <h1>Calculadora Graficadora</h1>
@@ -475,10 +437,7 @@
   </header>
 
   <main class="app">
-    <!-- ══ PANEL IZQUIERDO: CALCULADORA CIENTÍFICA ══ -->
     <section class="panel calc-panel" aria-label="Calculadora científica">
-      
-      <!-- Fila superior de estados -->
       <div class="calc-status-row">
         <span class="pill">Calculadora</span>
         <div class="mode-toggle" id="modeToggle">
@@ -488,18 +447,15 @@
         </div>
       </div>
 
-      <!-- 1. Cuadro de LATEX bonito (Arriba) -->
       <div class="preview-container">
         <p class="preview-label">Vista previa matemática</p>
         <div id="livePreview" aria-live="polite"></div>
       </div>
 
-      <!-- 2. Cuadro para Escribir (En medio) -->
       <div class="calc-input-wrap">
         <input type="text" id="calcInput" inputmode="text" autocomplete="off" spellcheck="false" placeholder="Escribe aquí tu función...">
       </div>
 
-      <!-- 3. Teclas con botones especiales (Abajo) -->
       <div class="keypad-groups" id="keypadGroups"></div>
 
       <button type="button" class="key key-equals" id="equalsBtn" style="width:100%">=</button>
@@ -507,7 +463,6 @@
       <div class="result-box" id="resultBox"></div>
     </section>
 
-    <!-- ══ PANEL DERECHO: GRÁFICA + FUNCIONES + HISTORIAL ══ -->
     <section class="graph-col">
       <div class="panel graph-panel" aria-label="Gráfica">
         <div class="graph-toolbar">
@@ -561,7 +516,6 @@
 
   <div id="toastStack"></div>
 
-  <!-- ══ MODAL: AJUSTES ══ -->
   <div class="modal-backdrop" id="settingsModal">
     <div class="modal" role="dialog" aria-labelledby="settingsTitle">
       <h2 id="settingsTitle">Ajustes</h2>
@@ -590,7 +544,6 @@
     </div>
   </div>
 
-  <!-- ══ MODAL: AYUDA ══ -->
   <div class="modal-backdrop" id="helpModal">
     <div class="modal" role="dialog" aria-labelledby="helpTitle">
       <h2 id="helpTitle">Ayuda rápida</h2>
@@ -608,6 +561,7 @@
     </div>
   </div>
 
+  <!-- TeoremaMath, TeoremaAPI, TeoremaUI, TeoremaCalculator, TeoremaGraph y scripts principales -->
   <script>
     (function (root, factory) {
     if (typeof module === "object" && module.exports) {
@@ -1255,7 +1209,12 @@
   </script>
 
   <script>
-    window.BACKEND_URL = window.BACKEND_URL || "http://127.0.0.1:8000";
+    // =========================================================================
+    // CONFIGURACIÓN DINÁMICA DEL BACKEND (Local vs Render con prefijo /graf)
+    // =========================================================================
+    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    window.BACKEND_URL = isLocal ? "http://127.0.0.1:8000/graf" : "https://prueba-integral-1.onrender.com/graf";
+    // =========================================================================
 
     const TeoremaAPI = (function () {
     "use strict";
@@ -1964,8 +1923,6 @@
             }
             }
 
-            // Si hay intersección calculada, no se dibujan las superficies
-            // implícitas individuales — se ve únicamente el volumen en común.
             const traces = crudos.filter((c) => !(c.v.kind === "implicit" && datosSuperposicion)).map((c) => {
             if (c.v.kind === "implicit") {
                 return {
@@ -2061,7 +2018,6 @@
     function baseLayout2D() {
         return {
         margin: { t: 20, r: 16, l: 44, b: 40 },
-        // LÍNEAS NEGRAS / GRISES CLARAS
         xaxis: { title: "x", showgrid: view.grid, visible: view.axes, zeroline: true, autorange: true, gridcolor: "rgba(0,0,0,0.6)", gridwidth: 1, zerolinecolor: "rgba(0,0,0,0.5)", zerolinewidth: 2 },
         yaxis: { title: "y", showgrid: view.grid, visible: view.axes, zeroline: true, autorange: true, gridcolor: "rgba(0,0,0,0.6)", gridwidth: 1, zerolinecolor: "rgba(0,0,0,0.5)", zerolinewidth: 2 },
         showlegend: view.legend,
@@ -2073,13 +2029,12 @@
     }
     
     function baseLayout3D() {
-        // LÍNEAS Y PAREDES NEUTRALES (SIN AZUL)
         const paredes = {
         showbackground: view.axes,
-        backgroundcolor: "rgba(240, 244, 248, 0.4)", // Gris azulado extremadamente tenue
-        gridcolor: "rgba(0,0,0,0.6)", // CUADRICULA NEGRA
+        backgroundcolor: "rgba(240, 244, 248, 0.4)",
+        gridcolor: "rgba(0,0,0,0.6)",
         gridwidth: 1,
-        zerolinecolor: "rgba(0,0,0,0.5)", // EJE CERO NEGRO
+        zerolinecolor: "rgba(0,0,0,0.5)",
         zerolinewidth: 2
         };
         return {
@@ -2391,9 +2346,6 @@
   </script>
   
   <script>
-    document.getElementById("backBtn").addEventListener("click", () => {
-    location.href = "Menu-Principal.html";
-    });
     document.getElementById("backendUrlDisplay").textContent = window.BACKEND_URL;
     document.getElementById("settingsBtn").addEventListener("click", () => {
       const current = document.querySelector("#modeToggle button.active")?.dataset.mode || "RAD";
@@ -2410,18 +2362,20 @@
       const RANGO_MIN = 0.5, RANGO_MAX = 50;
       function commitRangeInput() {
         const bruto = rangeInput.value.trim();
-        const valor = parseFloat(bruto);
-        if (bruto === "" || !Number.isFinite(valor)) {
-          TeoremaUI.showToast("Ingresa un número válido para el rango.", "error");
-          rangeInput.value = TeoremaGraph.getRange();
-          return;
+        classRangeInputLoop: {
+          const valor = parseFloat(bruto);
+          if (bruto === "" || !Number.isFinite(valor)) {
+            TeoremaUI.showToast("Ingresa un número válido para el rango.", "error");
+            rangeInput.value = TeoremaGraph.getRange();
+            break classRangeInputLoop;
+          }
+          const limitado = Math.max(RANGO_MIN, Math.min(valor, RANGO_MAX));
+          if (limitado !== valor) {
+            TeoremaUI.showToast(`El rango se ajustó a ±${limitado} (el límite permitido es de ${RANGO_MIN} a ${RANGO_MAX}).`, "error");
+          }
+          rangeInput.value = limitado;
+          TeoremaGraph.setRange(limitado);
         }
-        const limitado = Math.max(RANGO_MIN, Math.min(valor, RANGO_MAX));
-        if (limitado !== valor) {
-          TeoremaUI.showToast(`El rango se ajustó a ±${limitado} (el límite permitido es de ${RANGO_MIN} a ${RANGO_MAX}).`, "error");
-        }
-        rangeInput.value = limitado;
-        TeoremaGraph.setRange(limitado);
       }
       rangeInput.addEventListener("change", commitRangeInput);
       rangeInput.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); rangeInput.blur(); } });
