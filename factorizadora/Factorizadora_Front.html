@@ -13,9 +13,6 @@
     </script>
     <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
     <style>
-        /* Paleta alineada 1:1 con frontend1.html (Módulo 1) — mismos
-           nombres de variable que ya usaba este archivo, así que el
-           resto de la hoja de estilos no necesita tocarse. */
         :root {
             --bg: #eef5f7;
             --panel: rgba(255,255,255,.9);
@@ -44,7 +41,6 @@
             min-height: 100vh;
         }
 
-        /* ── BARRA SUPERIOR (igual receta que frontend1.html / la Calculadora Graficadora) ── */
         .topbar {
             background: linear-gradient(135deg, #0f172a, #124b68 55%, #0b6b6f);
             color: #fff;
@@ -60,18 +56,6 @@
         .topbar-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
         .topbar-titles h1 { margin: 0; font-size: clamp(17px, 2.2vw, 22px); font-weight: 800; color: #fff; text-align: left; }
         .topbar-titles .subtitle { margin: 2px 0 0; color: rgba(255,255,255,.78); font-size: 12px; }
-        .back-btn {
-            display: inline-flex; align-items: center; gap: 6px;
-            border: 1px solid rgba(255,255,255,.28);
-            background: rgba(255,255,255,.08);
-            color: #fff;
-            border-radius: 10px;
-            padding: 8px 12px;
-            font-size: 13px; font-weight: 700;
-            cursor: pointer;
-            transition: transform .12s, background .12s;
-        }
-        .back-btn:hover { transform: translateY(-1px); background: rgba(255,255,255,.18); }
 
         .page-content {
             display: flex;
@@ -80,7 +64,6 @@
             padding: 24px 20px 40px;
         }
 
-        /* Ampliamos el contenedor principal para que quepan ambos teclados a la par */
         .calculator {
             width: 100%;
             max-width: 740px;
@@ -132,7 +115,6 @@
             margin-bottom: 20px;
         }
 
-        /* Contenedor principal que coloca los dos teclados lado a lado */
         .teclados-contenedor {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -153,8 +135,6 @@
             gap: 10px;
         }
 
-        /* Ocupa las 4 columnas del teclado avanzado pero adentro usa su
-           propia grilla de 3, así cada potencia queda arriba de su raíz. */
         .grupo-potencias {
             grid-column: span 4;
             display: grid;
@@ -180,12 +160,8 @@
             color: var(--primary);
         }
 
-        .tecla:active {
-            transform: scale(.96);
-        }
+        .tecla:active { transform: scale(.96); }
 
-        /* Limpiar y Resolver ahora van juntos, debajo de los dos
-           teclados, en vez de cada uno suelto al fondo de su columna. */
         .acciones {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -249,71 +225,56 @@
             word-break: break-all;
         }
 
+        .btn-volver {
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            color: #124b68;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 10px;
+            background-color: #ffffff;
+            border: 1px solid #d9e1ea;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(24, 32, 47, 0.08);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
 
-      .btn-volver {
-          display: inline-flex;
-          align-items: center;
-          text-decoration: none;
-          color: #124b68;
-          font-family: Inter, "Segoe UI", Arial, sans-serif;
-          font-weight: 600;
-          font-size: 14px;
-          padding: 10px; /* Padding igualado para que el botón se vea cuadradito */
-          background-color: #ffffff;
-          border: 1px solid #d9e1ea;
-          border-radius: 8px;
-          box-shadow: 0 4px 15px rgba(24, 32, 47, 0.08);
-          transition: all 0.3s ease; /* Transición suave */
-          overflow: hidden; /* Oculta lo que sobresale */
-      }
+        .btn-volver:hover {
+            background-color: #f0f7ff;
+            border-color: #124b68;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(18, 75, 104, 0.15);
+            padding: 10px 16px;
+        }
 
-      .btn-volver:hover {
-          background-color: #f0f7ff;
-          border-color: #124b68;
-          transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(18, 75, 104, 0.15);
-          padding: 10px 16px; /* Al expandirse, recupera el padding horizontal */
-      }
+        .btn-texto {
+            max-width: 0;
+            opacity: 0;
+            margin-left: 0;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
 
-      /* Estado inicial del texto: Oculto y sin ancho */
-      .btn-texto {
-          max-width: 0;
-          opacity: 0;
-          margin-left: 0;
-          white-space: nowrap; /* Evita que el texto salte de línea al animarse */
-          transition: all 0.3s ease; /* Misma duración que el hover del botón */
-      }
-
-      /* Estado al hacer hover: Aparece el texto y se separa del ícono */
-      .btn-volver:hover .btn-texto {
-          max-width: 150px; /* Espacio suficiente para "Volver al Menú" */
-          opacity: 1;
-          margin-left: 8px; /* Esto reemplaza el antiguo 'gap' */
-      }
-
+        .btn-volver:hover .btn-texto {
+            max-width: 150px;
+            opacity: 1;
+            margin-left: 8px;
+        }
     </style>
-
-
-
-    
 </head>
 <body>
     <header class="topbar">
         <div class="topbar-left">
-
-
-
             <a href="../index.html" class="btn-volver">
-                  <!-- Ícono de flecha SVG -->
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <line x1="19" y1="12" x2="5" y2="12"></line>
                       <polyline points="12 19 5 12 12 5"></polyline>
                   </svg>
                   <span class="btn-texto">Volver al Menú</span>            
             </a>
-
-
-
             <div class="topbar-titles">
                 <h1>Calculadora de Factorización</h1>
                 <p class="subtitle">Módulo de Teorema</p>
@@ -325,10 +286,8 @@
     <section class="calculator">
         <p class="calc-heading">Calculadora Teorema - Factorización y Funciones</p>
 
-        <!-- Vista previa matemática en vivo, mismo estilo que frontend1.html -->
         <div id="livePreview" aria-live="polite"></div>
 
-        <!-- Pantalla única compartida por ambos teclados -->
         <input type="text" class="pantalla-input" id="pantalla-input" placeholder="Ej: x^2 - 4">
 
         <section class="resultado">
@@ -336,10 +295,7 @@
             <p id="texto-resultado">...</p>
         </section>
 
-        <!-- Contenedor que pone ambos teclados a la par -->
         <div class="teclados-contenedor">
-            
-            <!-- TECLADO 1: FACTORIZACIÓN Y BÁSICO -->
             <div class="seccion-teclado">
                 <h3>Factorización / Básico</h3>
                 <div class="botones">
@@ -366,12 +322,10 @@
                     <button type="button" class="tecla" data-val="0">0</button>
                     <button type="button" class="tecla" data-val="^">^</button>
                     <button type="button" class="tecla" data-val="(">(</button>
-
                     <button type="button" class="tecla" data-val=")">)</button>
                 </div>
             </div>
 
-            <!-- TECLADO 2: AVANZADO -->
             <div class="seccion-teclado">
                 <h3>Avanzado</h3>
                 <div class="teclado-avanzado">
@@ -403,7 +357,6 @@
                     <button type="button" class="tecla" data-val="!">n!</button>
                 </div>
             </div>
-
         </div>
 
         <div class="acciones">
@@ -414,14 +367,6 @@
     </main>
 
     <script>
-        /* =====================================================================
-           TEOREMA · Motor matemático compartido (idéntico al de la
-           Calculadora Graficadora — teorema-math.js) inlineado aquí para
-           mantener este archivo autocontenido en un solo HTML, igual que
-           el original. Tokeniza/traduce a LaTeX para la vista previa en
-           vivo; la factorización en sí la sigue resolviendo el backend
-           de Python sin cambios (ver más abajo).
-           ===================================================================== */
         const TeoremaMath = (function () {
           "use strict";
 
@@ -695,11 +640,6 @@
             return toLatexNode(ast, 0);
           }
 
-          // Traductor a sintaxis segura para el backend — mismas
-          // correcciones verificadas contra Calc_fac_back.py: "π"/"e"
-          // sueltos el backend los trata como símbolos, no como las
-          // constantes reales, y "mod/ncr/npr" no existen con ese
-          // nombre en sympy.
           function toBackendNode(node) {
             switch (node.type) {
               case "num": return node.v;
@@ -749,12 +689,10 @@
 
     <script>
         // =========================================================================
-        // CONFIGURACIÓN DEL BACKEND — EDITAR ESTA LÍNEA AL DESPLEGAR
+        // CONFIGURACIÓN DINÁMICA DEL BACKEND (Local vs Render con prefijo /fac)
         // =========================================================================
-        // Mismo patrón que frontend1.html: en desarrollo local apunta a
-        // 127.0.0.1; al desplegar, cámbialo por la URL pública del backend,
-        // sin barra al final.
-        window.BACKEND_URL = window.BACKEND_URL || "http://127.0.0.1:5000";
+        const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+        window.BACKEND_URL = isLocal ? "http://127.0.0.1:8000/fac" : "https://prueba-integral-1.onrender.com/fac";
         // =========================================================================
 
         const API_KEY = "teorema-api-secure-key-123";
@@ -766,10 +704,6 @@
         const btnLimpiar = document.getElementById('btn-limpiar');
         const btnResolver = document.getElementById('btn-resolver');
 
-        // Inserta en la posición del cursor (o reemplaza la selección) en
-        // vez de solo concatenar al final — mismo patrón que frontend1.html,
-        // con offset para dejar el cursor listo dentro de paréntesis recién
-        // insertados (p. ej. "sqrt()" deja el cursor entre los paréntesis).
         function insertarEnCursor(texto, offset) {
             offset = offset || 0;
             const s = inputPantalla.selectionStart ?? inputPantalla.value.length;
@@ -801,7 +735,6 @@
             }
         }
 
-        // Escribir en la pantalla desde cualquier teclado
         botonesTeclas.forEach(boton => {
             boton.addEventListener('click', () => {
                 const valor = boton.getAttribute('data-val');
@@ -810,11 +743,8 @@
             });
         });
 
-        // También actualizar la vista previa si se escribe directamente
-        // en la pantalla (no solo con los botones del teclado).
         inputPantalla.addEventListener('input', actualizarVistaPrevia);
 
-        // Limpiar pantalla
         btnLimpiar.addEventListener('click', () => {
             inputPantalla.value = '';
             inputPantalla.focus();
@@ -823,13 +753,10 @@
             textoResultado.style.color = 'var(--text)';
         });
 
-        // Resolver enviando al backend de Python (mismo endpoint, mismo
-        // método, mismos headers y cuerpo que antes — solo la URL base
-        // ahora viene de window.BACKEND_URL en vez de estar fija).
         btnResolver.addEventListener('click', async () => {
             const polinomio = inputPantalla.value;
             let paraBackend = polinomio;
-            try { paraBackend = TeoremaMath.toBackendSyntax(polinomio); } catch (e) { /* si no se puede traducir, se manda tal cual */ }
+            try { paraBackend = TeoremaMath.toBackendSyntax(polinomio); } catch (e) {}
             textoResultado.textContent = 'Calculando...';
             textoResultado.style.color = 'var(--text-light)';
 
@@ -846,8 +773,6 @@
                 const resultadoJson = await response.json();
 
                 if (response.ok && resultadoJson.status === 'success') {
-  
-                    // Convertimos la sintaxis de Python a LaTeX y renderizamos
                     let latexResult = resultadoJson.data;
                     try {
                         latexResult = TeoremaMath.toLatex(resultadoJson.data);
@@ -868,7 +793,6 @@
                 textoResultado.style.color = 'var(--danger)';
             }
         });
-
     </script>
 </body>
 </html>
