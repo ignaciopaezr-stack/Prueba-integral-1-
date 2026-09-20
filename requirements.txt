@@ -8,3 +8,5 @@ pillow
 colorama
 fpdf
 python-dotenv
+fastapi
+uvicorn
