@@ -1,0 +1,1052 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Módulo 1 – Práctica rápida</title>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [["\\(", "\\)"], ["$", "$"]], displayMath: [["\\[", "\\]"]] },
+      svg: { fontCache: "global" },
+      startup: { typeset: false }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    :root {
+      --ink: #18202f;
+      --muted: #667085;
+      --panel: #ffffff;
+      --soft: #f4f7fb;
+      --line: #d9e1ea;
+      --brand: #124b68;
+      --brand-2: #0b6b6f;
+      --accent: #c27a2c;
+      --good: #137a4b;
+      --bad: #b42318;
+    }
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left,  #dfefff 0, transparent 35%),
+        radial-gradient(circle at top right, #e7fff7 0, transparent 30%),
+        linear-gradient(180deg, #eef5f7 0%, #f8fafc 42%, #fff 100%);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ─────────────────────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, #0f172a, #124b68 55%, #0b6b6f);
+      color: white;
+      padding: 20px clamp(18px, 4vw, 56px);
+      border-bottom: 4px solid var(--accent);
+      box-shadow: 0 10px 30px rgba(15,23,42,.18);
+    }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 18px;
+      max-width: 1180px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+    }
+    h1 { margin: 0; font-size: clamp(20px, 2.6vw, 32px); font-weight: 800; }
+    .subtitle { margin: 6px 0 0; color: rgba(255,255,255,.8); font-size: 13px; }
+    .score { min-width: 230px; text-align: right; font-weight: 700; font-size: 14px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    .metric { color: rgba(255,255,255,.82); font-size: 12px; font-weight: 700; }
+    .metric strong { display: inline; color: white; font-size: 15px; line-height: 1.1; }
+
+    /* ── LAYOUT ─────────────────────────────────────────────────────── */
+    main {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 18px clamp(14px, 3vw, 42px) 48px;
+      display: grid;
+      grid-template-columns: 270px minmax(0, 1fr);
+      gap: 16px;
+    }
+    .panel {
+      background: rgba(255,255,255,.9);
+      border: 1px solid rgba(217,225,234,.9);
+      box-shadow: 0 16px 40px rgba(24,32,47,.10);
+      border-radius: 16px;
+      backdrop-filter: blur(8px);
+    }
+
+    /* ── SIDEBAR ─────────────────────────────────────────────────────── */
+    .side {
+      padding: 14px;
+      align-self: start;
+      position: sticky;
+      top: 14px;
+    }
+    .section-title {
+      margin: 0 0 8px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    button, select, input { font: inherit; }
+    button {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 9px 11px;
+      cursor: pointer;
+      transition: transform .12s, border-color .12s, background .12s, color .12s;
+    }
+    button:hover { transform: translateY(-1px); border-color: var(--brand); background: #f0f7ff; color: var(--brand); }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+
+    .quick {
+      text-align: center;
+      font-size: 12.5px;
+      font-weight: 700;
+      background: var(--soft);
+      padding: 8px 6px;
+    }
+    .quick.active {
+      background: var(--brand);
+      color: white;
+      border-color: var(--brand);
+    }
+
+    button.primary  { background: var(--brand); color: white; border-color: var(--brand); font-weight: 800; }
+    button.accent   { background: #fff7ed; color: #8a4b10; border-color: #f4c38a; font-weight: 800; }
+    button.good     { background: #ecfdf3; color: var(--good); border-color: #abd9bf; font-weight: 800; }
+    button.danger   { background: #fff1f0; color: var(--bad);  border-color: #f4b8b2; font-weight: 800; }
+
+    label { display: grid; gap: 5px; color: var(--muted); font-size: 12px; font-weight: 700; margin: 8px 0; }
+    select, input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px 12px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 500;
+      outline: none;
+      min-height: 38px;
+      box-shadow: 0 1px 2px rgba(16,24,40,.04);
+    }
+    select:focus, input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(18,75,104,.15); }
+
+    .difficulty-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 8px 0 14px; }
+    .difficulty-row button { padding: 7px 5px; font-size: 11.5px; }
+    .difficulty-row button.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+
+    .exam-box { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+    .exam-grid {
+      display: grid;
+      grid-template-columns: 1fr 80px;
+      gap: 10px;
+      align-items: end;
+      margin-bottom: 8px;
+    }
+    .exam-grid label { margin: 0; }
+    .exam-grid button { height: 38px; min-height: 38px; margin: 0; padding: 0; }
+
+    /* ── WORKSPACE ───────────────────────────────────────────────────── */
+    .workspace {
+      padding: clamp(14px, 2.5vw, 24px);
+      min-height: 600px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 14px;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 11.5px;
+      font-weight: 800;
+    }
+
+    /* ── TARJETA DE PREGUNTA ─────────────────────────────────────────── */
+    .question-card {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #fff 0%, #fbfcfe 100%);
+      box-shadow: 0 12px 28px rgba(24,32,47,.07);
+      border-radius: 14px;
+      padding: clamp(14px, 2.5vw, 22px);
+      display: grid;
+      gap: 0;
+    }
+    .q-meta {
+      margin: 0 0 10px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: .03em;
+      line-height: 1.4;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .q-statement {
+      margin: 0 0 14px;
+      font-size: clamp(14px, 1.6vw, 16px);
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.6;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+    .math-box {
+      min-height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      background: var(--soft);
+      padding: 18px 20px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      max-width: 100%;
+    }
+    .math-box-inner {
+      min-width: 0;
+      text-align: center;
+      width: 100%;
+    }
+    .math-render {
+      display: block;
+      text-align: center;
+      font-size: clamp(20px, 2.4vw, 28px);
+      line-height: 1.5;
+      overflow-x: auto;
+    }
+    .plain-fallback {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+      word-break: break-word;
+      font-family: monospace;
+    }
+
+    /* ── ZONA DE RESPUESTA ───────────────────────────────────────────── */
+    .answer-zone {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(217,225,234,.95);
+      background: linear-gradient(180deg, #fff 0%, #f8fbff 100%);
+      box-shadow: 0 12px 28px rgba(24,32,47,.07);
+    }
+    textarea#answerInput {
+      width: 100%;
+      min-height: 130px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 15px;
+      line-height: 1.5;
+      outline: none;
+    }
+    textarea#answerInput:focus { border-color: #7aa7ff; box-shadow: 0 0 0 3px rgba(122,167,255,.16); }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0,1fr));
+      gap: 6px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fbfdff;
+    }
+    .keypad button { min-height: 32px; padding: 5px 4px; font-size: 11.5px; font-weight: 800; border-radius: 8px; }
+
+    .btn-row, .button-row { display: flex; gap: 9px; flex-wrap: wrap; }
+    .btn-row button, .button-row button { padding: 9px 13px; border-radius: 10px; font-weight: 800; box-shadow: 0 6px 14px rgba(24,32,47,.07); }
+
+    .feedback {
+      min-height: 50px;
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      background: #fff;
+      font-size: 13.5px;
+    }
+    .feedback.correct { color: var(--good); border-color: #a6d8bd; background: #f0fff6; font-weight: 800; border-style: solid; }
+    .feedback.wrong   { color: var(--bad);  border-color: #f0b8b0; background: #fff6f5; font-weight: 800; border-style: solid; }
+    .answer-key { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); color: var(--ink); font-weight: 700; }
+
+    #livePreview {
+      min-height: 44px;
+      color: var(--brand);
+      font-weight: 700;
+      border-bottom: 1px dashed var(--line);
+      padding-bottom: 8px;
+      margin-bottom: 4px;
+      text-align: left;
+      font-size: 15px;
+    }
+
+    .exam-summary {
+      display: grid;
+      gap: 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      padding: 16px;
+      overflow-y: auto;
+    }
+    .exam-results-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+    .exam-results-table th {
+      background: var(--soft);
+      border: 1px solid var(--line);
+      padding: 7px 10px;
+      text-align: left;
+      font-weight: 800;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--muted);
+    }
+    .exam-results-table td {
+      border: 1px solid var(--line);
+      padding: 7px 10px;
+      vertical-align: top;
+      line-height: 1.4;
+    }
+    .exam-results-table tr.row-correct td { background: #f0fff6; }
+    .exam-results-table tr.row-wrong   td { background: #fff6f5; }
+    .res-mark { font-weight: 900; font-size: 13px; }
+    .res-mark.ok  { color: var(--good); }
+    .res-mark.bad { color: var(--bad);  }
+    .res-correct-ans { color: var(--good); font-weight: 700; }
+    .res-wrong-ans   { color: var(--bad);  font-weight: 700; }
+    .empty {
+      height: 100%;
+      min-height: 320px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      text-align: center;
+      border: 1px dashed var(--line);
+      border-radius: 10px;
+      background: #fff;
+      padding: 24px;
+    }
+
+    /* ── RESPONSIVE ──────────────────────────────────────────────────── */
+    @media (max-width: 820px) {
+      main { grid-template-columns: 1fr; }
+      .side { position: static; }
+      .top { flex-direction: column; align-items: start; }
+      .score { text-align: left; }
+      .keypad { grid-template-columns: repeat(auto-fit, minmax(54px,1fr)); }
+      .exam-grid { grid-template-columns: 1fr; }
+      .quick-grid { grid-template-columns: repeat(auto-fit, minmax(100px,1fr)); }
+    }
+
+    .btn-volver {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    color: #124b68;
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px; /* Padding igualado para que el botón se vea cuadradito */
+    background-color: #ffffff;
+    border: 1px solid #d9e1ea;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(24, 32, 47, 0.08);
+    transition: all 0.3s ease; /* Transición suave */
+    overflow: hidden; /* Oculta lo que sobresale */
+    }
+
+    .btn-volver:hover {
+        background-color: #f0f7ff;
+        border-color: #124b68;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(18, 75, 104, 0.15);
+        padding: 10px 16px; /* Al expandirse, recupera el padding horizontal */
+    }
+
+    /* Estado inicial del texto: Oculto y sin ancho */
+    .btn-texto {
+        max-width: 0;
+        opacity: 0;
+        margin-left: 0;
+        white-space: nowrap; /* Evita que el texto salte de línea al animarse */
+        transition: all 0.3s ease; /* Misma duración que el hover del botón */
+    }
+
+    /* Estado al hacer hover: Aparece el texto y se separa del ícono */
+    .btn-volver:hover .btn-texto {
+        max-width: 150px; /* Espacio suficiente para "Volver al Menú" */
+        opacity: 1;
+        margin-left: 8px; /* Esto reemplaza el antiguo 'gap' */
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+
+    <a href="Menu-Principal.html" class="btn-volver">
+        <!-- Ícono de flecha SVG -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span class="btn-texto"></span>Volver al Menú</span>            
+    </a>
+    <div class="top">
+      <div>
+        <h1>Módulo 1 – Práctica rápida</h1>
+        <p class="subtitle">Elige un modo, responde y revisa al instante.</p>
+      </div>
+      <div class="score" id="score">
+        <div class="metric"><strong id="correctMetric">0</strong> correctas</div>
+        <div class="metric"><strong id="attemptMetric">0</strong> intentos</div>
+        <div class="metric"><strong id="rateMetric">0%</strong> acierto</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <aside class="panel side">
+      <p class="section-title">Temas</p>
+      <div class="quick-grid" id="quickModes"></div>
+
+      <p class="section-title">Practica</p>
+      <label> Tema <select id="topicSelect"></select> </label>
+      <label> Subtipo <select id="subtypeSelect"></select> </label>
+      <div class="difficulty-row" id="difficultyRow"></div>
+      <button class="primary" id="newManualBtn" style="width:100%;margin-top:4px">Nueva pregunta</button>
+
+      <div class="exam-box">
+        <p class="section-title">Examen</p>
+        <label> Tema <select id="examTopicSelect"></select> </label>
+        <div class="difficulty-row" id="examDifficultyRow"></div>
+        <div class="exam-grid">
+          <label> Preguntas <input id="examQuantityInput" type="number" min="1" max="50" value="10"> </label>
+          <button class="danger" id="startExamBtn">Iniciar</button>
+        </div>
+      </div>
+    </aside>
+
+    <section class="panel workspace">
+      <div class="status-row">
+        <span class="pill" id="modePill">Sin modo seleccionado</span>
+        <span class="pill" id="examPill">Práctica libre</span>
+      </div>
+
+      <div id="questionArea" class="empty">
+        <div>
+          <strong>Escoge un modo para comenzar.</strong>
+          <p>La app genera preguntas y valida al instante.</p>
+        </div>
+      </div>
+
+      <div class="answer-zone">
+        <div id="livePreview"></div>
+        <textarea id="answerInput" rows="4" placeholder="Escribe tu respuesta aquí. Ej: (x+2)**2, sqrt(3)/3, x<=2"></textarea>
+        <div class="btn-row">
+          <button class="good"    id="checkBtn">Revisar</button>
+          <button class="accent"  id="showAnswerBtn">Ver respuesta</button>
+          <button                 id="nextBtn">Siguiente</button>
+          <button class="primary" id="pdfBtn">PDF</button>
+        </div>
+        <div class="keypad" id="mathKeypad"></div>
+        <div id="feedback" class="feedback">Todavía no hay respuesta revisada.</div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // =========================================================================
+    // CONFIGURACIÓN DEL BACKEND — EDITAR ESTA LÍNEA AL DESPLEGAR
+    // =========================================================================
+    // Este archivo (frontend.html) es solo el frontend (HTML/CSS/JS estático),
+    // pensado para subirse a GitHub Pages. La generación de ejercicios y el
+    // PDF requieren Python + SymPy, que corre por separado en "backend.py"
+    // (el backend unificado: motor de Módulo 1 + servidor http.server).
+    //
+    // 1. Despliega backend.py en un servicio que ejecute Python
+    //    (Render, Railway, Fly.io, PythonAnywhere, etc. — escucha en 0.0.0.0
+    //    y respeta la variable de entorno PORT, así que funciona tal cual en Render).
+    // 2. Copia la URL pública que te dé ese servicio
+    //    (ej. "https://tu-app.onrender.com") y pégala abajo, SIN barra al final.
+    // 3. Si estás probando en tu propia computadora con "python backend.py --auto-port",
+    //    usa "http://127.0.0.1:8080" (o el puerto que haya elegido).
+    window.BACKEND_URL = "http://127.0.0.1:8080/";
+    // =========================================================================
+
+    const state = {
+      options: null, currentExercise: null, topic: "factorizacion", subtype: "",
+      difficulty: "normal", examDifficulty: "normal", mode: "practice",
+      exam: null, examIndex: 0, examCorrect: 0, examAnswered: 0,
+      correct: 0, attempts: 0, checkedCurrent: false, examLog: [], seenFingerprints: [],
+    };
+    const MAX_SEEN_FINGERPRINTS = 40;
+
+    function exerciseFingerprint(ex) {
+      const plain = ex?.display?.plain ?? "";
+      return `${ex?.subtype ?? ""}||${plain}`;
+    }
+
+    function trackExercise(ex) {
+      if (!ex) return;
+      const fp = exerciseFingerprint(ex);
+      state.seenFingerprints = state.seenFingerprints.filter(f => f !== fp);
+      state.seenFingerprints.push(fp);
+      if (state.seenFingerprints.length > MAX_SEEN_FINGERPRINTS) {
+        state.seenFingerprints.shift();
+      }
+    }
+
+    const el = {
+      quickModes: document.getElementById("quickModes"), topicSelect: document.getElementById("topicSelect"),
+      subtypeSelect: document.getElementById("subtypeSelect"), difficultyRow: document.getElementById("difficultyRow"),
+      examTopicSelect: document.getElementById("examTopicSelect"), examDifficultyRow: document.getElementById("examDifficultyRow"),
+      examQuantityInput: document.getElementById("examQuantityInput"), startExamBtn: document.getElementById("startExamBtn"),
+      newManualBtn: document.getElementById("newManualBtn"), questionArea: document.getElementById("questionArea"),
+      answerInput: document.getElementById("answerInput"), mathKeypad: document.getElementById("mathKeypad"),
+      checkBtn: document.getElementById("checkBtn"), showAnswerBtn: document.getElementById("showAnswerBtn"),
+      nextBtn: document.getElementById("nextBtn"), pdfBtn: document.getElementById("pdfBtn"),
+      feedback: document.getElementById("feedback"), score: document.getElementById("score"),
+      correctMetric: document.getElementById("correctMetric"), attemptMetric: document.getElementById("attemptMetric"),
+      rateMetric: document.getElementById("rateMetric"), modePill: document.getElementById("modePill"),
+      examPill: document.getElementById("examPill"), livePreview: document.getElementById("livePreview"),
+    };
+
+    const SUBTYPE_LABELS = {
+      factor_comun: "factor común", agrupacion: "agrupación", diferencia_cuadrados: "diferencia de cuadrados",
+      trinomio_cuadrado_perfecto: "trinomio cuadrado perfecto", trinomio_inspeccion: "trinomio por inspección",
+      trinomio_ac: "trinomio AC", sustitucion: "sustitución", suma_cubos: "suma de cubos",
+      diferencia_cubos: "diferencia de cubos", formula_general: "fórmula general", division_sintetica: "división sintética",
+      completar_cuadrado: "completar cuadrado", completar_cuadrado_trinomio: "completar cuadrado (trinomio)",
+      completar_cuadrado_binomio: "completar cuadrado (binomio)", lineal_basica: "lineal básica",
+      lineal_parentesis: "lineal con paréntesis", cuadratica_raices_enteras: "cuadrática raíces enteras",
+      cuadratica_raices_racionales: "cuadrática raíces racionales", cuadratica_sin_reales: "cuadrática sin raíces reales",
+      cuadratica_ambos_lados: "cuadrática ambos lados", cuadratica_analisis: "análisis cuadrática (Δ, eje, raíces)",
+      sistemas_ecuaciones: "sistemas de ecuaciones", raiz_cuadrada_simple: "raíz cuadrada simple",
+      raiz_n_esima: "raíz n-ésima", binomio_raices_cuadradas: "binomio con √", binomio_raices_cubicas: "binomio con ∛",
+      trinomio_raices_cuadradas: "trinomio con √", inecuacion_lineal: "inecuación lineal",
+      inecuacion_cuadratica: "inecuación cuadrática", valor_absoluto_ecuacion: "ecuación |x|",
+      valor_absoluto_inecuacion: "inecuación |x|", comparacion_valor_absoluto: "comparación |x|",
+      valor_absoluto_doble: "valor absoluto doble", valor_absoluto_anidado: "valor absoluto anidado",
+      valor_absoluto_mixto: "suma de valores absolutos", coeficiente_posicion_k: "coeficiente en posición k",
+      termino_posicion_k: "término en posición k", polinomio_completo: "polinomio completo",
+      terminos_rango: "términos del a al b", posicion_de_potencia: "posición de la potencia",
+    };
+
+    function sympyToLatex(str) {
+      if (!str) return "";
+      let tex = str;
+      tex = tex.replace(/\*\*/g, "^").replace(/\*/g, "\\cdot ").replace(/\boo\b/g, "\\infty")
+               .replace(/\bpi\b/g, "\\pi").replace(/<=/g, "\\le ").replace(/>=/g, "\\ge ")
+               .replace(/\bU\b/g, "\\cup ").replace(/Rational\(([^,]+),([^)]+)\)/g, "\\frac{$1}{$2}")
+               .replace(/sqrt\(([^)]+)\)/g, "\\sqrt{$1}").replace(/root\(([^,]+),([^)]+)\)/g, "\\sqrt[$2]{$1}")
+               .replace(/Abs\(([^)]+)\)/g, "|$1|");
+      return tex;
+    }
+
+    function addImplicitMul(expr) {
+      if (!expr) return expr;
+      let s = expr;
+      s = s.replace(/\)\s*\(/g, ")*(").replace(/\)\s*([A-Za-z0-9])/g, ")*$1")
+           .replace(/(\d)\s*\(/g, "$1*(").replace(/(\d)([A-Za-z])(?!\s*[\*\(])/g, "$1*$2");
+      return s;
+    }
+
+    function updatePreview() {
+      const raw = el.answerInput.value;
+      if (!raw.trim()) { el.livePreview.innerHTML = ""; return; }
+      el.livePreview.innerHTML = `\\[${sympyToLatex(addImplicitMul(raw))}\\]`;
+      if (window.MathJax?.typesetPromise) window.MathJax.typesetPromise([el.livePreview]).catch(()=>{});
+    }
+
+    function escapeHtml(v) { return String(v ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
+
+    // COMUNICACIÓN HTTP CON EL BACKEND
+    // BACKEND_URL se define al inicio de este mismo <script>, justo después
+    // de "const state = {...}" más arriba — editar ahí al desplegar.
+    const API_TIMEOUT_MS = 45000; // Render free tier puede tardar ~30-50s en despertar de dormido
+
+    async function api(path, payload = null) {
+      const base = String(window.BACKEND_URL || "").replace(/\/+$/, "");
+      const url = `${base}${path}`;
+      const isGet = path === "/api/options" && payload === null;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
+      let res;
+      try {
+        res = await fetch(url, {
+          method: isGet ? "GET" : "POST",
+          headers: isGet
+            ? { "Accept": "application/json" }
+            : { "Content-Type": "application/json", "Accept": "application/json" },
+          ...(isGet ? {} : { body: JSON.stringify(payload || {}) }),
+          signal: controller.signal,
+        });
+      } catch (networkErr) {
+        if (networkErr.name === "AbortError") {
+          throw new Error("El servidor tardó demasiado en responder. Si llevaba un rato inactivo puede estar despertando — intenta de nuevo en unos segundos.");
+        }
+        throw new Error(`No se pudo conectar con el servidor (${window.BACKEND_URL}). Verifica tu conexión o que el backend esté activo.`);
+      } finally {
+        clearTimeout(timeoutId);
+      }
+
+      // Siempre intentamos leer el cuerpo JSON, incluso en respuestas de error:
+      // el backend manda {success:false, error:"..."} con el motivo real, y antes
+      // esa información se descartaba y solo se mostraba "error 400/500" pelado.
+      let data = null;
+      try { data = await res.json(); } catch { /* el cuerpo no era JSON valido */ }
+
+      if (!res.ok) throw new Error(data?.error || `El servidor respondió con error ${res.status}.`);
+      if (!data || !data.success) throw new Error(data?.error || "Error en el servidor.");
+      return data.data;
+    }
+
+    function subtypeLabel(st) {
+      if (!st) return "aleatorio";
+      if (st.includes(":")) {
+        const [base, dir] = st.split(":", 2);
+        const baseLabel = SUBTYPE_LABELS[base] || base.replaceAll("_"," ");
+        return `${baseLabel} · ${dir === "expandir" ? "expandir" : "factorizar"}`;
+      }
+      return SUBTYPE_LABELS[st] || st.replaceAll("_"," ");
+    }
+
+    function renderScore() {
+      const rate = state.attempts ? Math.round((state.correct / state.attempts) * 100) : 0;
+      if (el.correctMetric) {
+        el.correctMetric.textContent = state.correct;
+        el.attemptMetric.textContent = state.attempts;
+        el.rateMetric.textContent = `${rate}%`;
+      }
+    }
+
+    function renderFeedback(msg, kind = "") {
+      el.feedback.className = `feedback ${kind}`;
+      el.feedback.innerHTML = msg;
+    }
+
+    function insertAtCursor(text, cursorOffset = 0) {
+      const inp = el.answerInput;
+      const s = inp.selectionStart ?? inp.value.length;
+      const e = inp.selectionEnd   ?? inp.value.length;
+      inp.value = inp.value.slice(0,s) + text + inp.value.slice(e);
+      const next = s + text.length + cursorOffset;
+      inp.focus();
+      inp.setSelectionRange(Math.max(0,next), Math.max(0,next));
+    }
+
+    function renderKeypad() {
+      const keys = [
+        {label:"x",value:"x"},{label:"y",value:"y"},{label:"z",value:"z"},
+        {label:"(",value:"("},{label:")",value:")"},{label:"[",value:"["},{label:"]",value:"]"},
+        {label:"+",value:"+"},{label:"-",value:"-"},{label:"×",value:"*"},{label:"÷",value:"/"},
+        {label:"■/■",value:"Rational(,)",offset:-2},{label:"½",value:"Rational(1,2)"},{label:"⅓",value:"Rational(1,3)"},
+        {label:"√x",value:"sqrt()",offset:-1},{label:"ⁿ√x",value:"root(,)",offset:-2},
+        {label:"x²",value:"**2"},{label:"x³",value:"**3"},{label:"xⁿ",value:"**"},
+        {label:"|x|",value:"Abs()",offset:-1},{label:"∞",value:"oo"},{label:"∪",value:"U"},{label:"π",value:"pi"},
+        {label:"=",value:"="},{label:"≤",value:"<="},{label:"≥",value:">="},
+        {label:",",value:","},{label:"Ninguna",value:"none"},
+        {label:"⌫",action:"backspace"},{label:"C",action:"clear"},
+      ];
+      el.mathKeypad.innerHTML = keys.map((k,i) => `<button type="button" data-key="${i}">${escapeHtml(k.label)}</button>`).join("");
+      el.mathKeypad.querySelectorAll("button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const key = keys[Number(btn.dataset.key)];
+          const inp = el.answerInput;
+          if (key.action === "clear") { inp.value=""; inp.focus(); updatePreview(); return; }
+          if (key.action === "backspace") {
+            const s=inp.selectionStart??inp.value.length, e=inp.selectionEnd??inp.value.length;
+            if (s!==e) { inp.value=inp.value.slice(0,s)+inp.value.slice(e); inp.setSelectionRange(s,s); }
+            else if (s>0) { inp.value=inp.value.slice(0,s-1)+inp.value.slice(s); inp.setSelectionRange(s-1,s-1); }
+            inp.focus(); updatePreview(); return;
+          }
+          insertAtCursor(key.value, key.offset||0); updatePreview();
+        });
+      });
+    }
+
+    function answerText(ans) {
+      if (!ans) return "";
+      if (ans.kind==="list") return (ans.plain||[]).join(", ");
+      return ans.plain ?? "";
+    }
+    function answerLatex(ans) {
+      if (!ans) return null;
+      if (ans.kind==="list") return (ans.latex||[]).join(", ");
+      return ans.latex;
+    }
+    const NO_SOLUTION_TEXT = "No tiene solucion real (conjunto vacio).";
+    // Normaliza result.expected (puede venir como array, string u omitido) a un texto plano.
+    // Si el resultado es un conjunto vacio (ej. cuadratica sin raices reales), devuelve un
+    // mensaje explicito en vez de una cadena vacia, para que el feedback nunca se vea en blanco.
+    function formatExpected(expected, fallbackAns) {
+      let text;
+      if (Array.isArray(expected)) {
+        text = expected.join(", ");
+      } else if (expected !== undefined && expected !== null && expected !== "") {
+        text = String(expected);
+      } else {
+        text = answerText(fallbackAns);
+      }
+      return text.trim() ? text : NO_SOLUTION_TEXT;
+    }
+
+    function renderDisplay(display) {
+      if (!display) return "";
+      if (display.kind==="math" && display.latex) {
+        return `<div class="math-render">\\[${display.latex}\\]</div><code class="plain-fallback">${escapeHtml(display.plain)}</code>`;
+      }
+      return `<div class="math-render">${escapeHtml(display.plain)}</div>`;
+    }
+
+    function renderQuestion(exercise) {
+      const meta = exercise.metadata || {};
+      const diff = meta.difficulty === "easy" ? "fácil" : (meta.difficulty === "hard" || meta.hard ? "avanzado" : "normal");
+      const st = subtypeLabel(exercise.subtype);
+      const dirTag = exercise.topic === "factorizacion" && meta.direction ? ` · ${meta.direction === "expandir" ? "expandir" : "factorizar"}` : "";
+      const metaLine = `${escapeHtml(exercise.topic_label)} · ${escapeHtml(st)}${escapeHtml(dirTag)} · ${escapeHtml(diff)}`;
+      const statementHtml = escapeHtml(exercise.statement || "");
+      const mathHtml = renderDisplay(exercise.display);
+
+      el.questionArea.className = "question-card";
+      el.questionArea.innerHTML = `<p class="q-meta">${metaLine}</p><p class="q-statement">${statementHtml}</p><div class="math-box"><div class="math-box-inner">${mathHtml}</div></div>`;
+      if (window.MathJax?.typesetPromise) window.MathJax.typesetPromise([el.questionArea]).catch(()=>{});
+    }
+
+    function updatePills(topicLabel, examStr, extraClass = "") {
+      el.modePill.textContent = topicLabel;
+      el.modePill.className = `pill ${extraClass}`.trim();
+      el.examPill.textContent = examStr;
+    }
+
+    const DIFFICULTY_BUTTONS = [{ key: "easy", label: "Facil" }, { key: "normal", label: "Normal" }, { key: "hard", label: "Avanzado" }];
+    function difficultyButtons(container, stateKey) {
+      if (!container) return;
+      container.innerHTML = DIFFICULTY_BUTTONS.map(d => `<button type="button" data-diff="${d.key}">${escapeHtml(d.label)}</button>`).join("");
+      container.querySelectorAll("button").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.diff === state[stateKey]);
+        btn.addEventListener("click", () => {
+          state[stateKey] = btn.dataset.diff || "normal";
+          container.querySelectorAll("button").forEach(item => item.classList.toggle("active", item === btn));
+        });
+      });
+    }
+
+    function populateSubtypes() {
+      const topic = el.topicSelect.value;
+      const subtypes = state.options?.subtypes?.[topic] || [];
+      const expandable = new Set(state.options?.expandableSubtypes || []);
+      const current = el.subtypeSelect.value;
+
+      if (topic === "factorizacion") {
+        const notables = subtypes.filter(s => expandable.has(s));
+        const metodos = subtypes.filter(s => !expandable.has(s));
+        let html = `<option value="">Aleatorio (todos)</option>`;
+        if (metodos.length) {
+          html += `<optgroup label="─ Métodos de factorización">`;
+          for (const s of metodos) html += `<option value="${escapeHtml(s)}">${escapeHtml(subtypeLabel(s))}</option>`;
+          html += `</optgroup>`;
+        }
+        if (notables.length) {
+          html += `<optgroup label="─ Fórmulas notables – Factorizar">`;
+          for (const s of notables) html += `<option value="${escapeHtml(s + ":reducir")}">${escapeHtml(subtypeLabel(s))} · Factorizar</option>`;
+          html += `</optgroup><optgroup label="─ Fórmulas notables – Expandir">`;
+          for (const s of notables) html += `<option value="${escapeHtml(s + ":expandir")}">${escapeHtml(subtypeLabel(s))} · Expandir</option>`;
+          html += `</optgroup>`;
+        }
+        el.subtypeSelect.innerHTML = html;
+      } else {
+        el.subtypeSelect.innerHTML = [`<option value="">Aleatorio</option>`, ...subtypes.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(subtypeLabel(s))}</option>`)].join("");
+      }
+      const allValues = Array.from(el.subtypeSelect.options).map(o => o.value);
+      el.subtypeSelect.value = allValues.includes(current) ? current : "";
+      state.topic = topic;
+      state.subtype = el.subtypeSelect.value || "";
+    }
+
+    function populateOptions(options) {
+      options.expandableSubtypes = options.expandableSubtypes || [];
+      const topicOpts = Object.entries(options.topics).map(([k,v]) => `<option value="${escapeHtml(k)}">${escapeHtml(v)}</option>`).join("");
+      el.topicSelect.innerHTML = topicOpts; el.examTopicSelect.innerHTML = topicOpts;
+      el.topicSelect.value = state.topic; el.examTopicSelect.value = "factorizacion";
+      difficultyButtons(el.difficultyRow, "difficulty"); difficultyButtons(el.examDifficultyRow, "examDifficulty");
+      populateSubtypes();
+      const maxQ = Number(options.maxQuestions) || 50;
+      if (el.examQuantityInput) {
+        el.examQuantityInput.max = String(maxQ);
+        if (Number(el.examQuantityInput.value) > maxQ) el.examQuantityInput.value = String(maxQ);
+      }
+      el.quickModes.innerHTML = options.quickModes.map((m,i) => `<button class="quick" data-index="${i}">${escapeHtml(m.label)}</button>`).join("");
+      el.quickModes.querySelectorAll("button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          el.quickModes.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          const mode = options.quickModes[Number(btn.dataset.index)];
+          el.topicSelect.value = mode.topic; populateSubtypes();
+          el.subtypeSelect.value = mode.subtype || ""; state.subtype = mode.subtype || "";
+          newExercise(mode.topic, mode.subtype || "");
+        });
+      });
+    }
+
+    function renderExercise() {
+      if (!state.currentExercise) {
+        el.questionArea.className = "empty";
+        el.questionArea.innerHTML = `<div><strong>No hay ejercicio.</strong><p>Escoge un modo para comenzar.</p></div>`;
+        return;
+      }
+      renderQuestion(state.currentExercise);
+    }
+
+    async function newExercise(topic = el.topicSelect.value, subtype = el.subtypeSelect.value) {
+      state.mode = "practice"; state.exam = null; state.examIndex = state.examCorrect = state.examAnswered = 0; state.examLog = [];
+      el.showAnswerBtn.style.display = ""; state.topic = topic || "factorizacion"; state.subtype = subtype || "";
+      state.checkedCurrent = false; el.answerInput.value = ""; updatePreview(); renderFeedback("Generando pregunta…");
+      const diff = state.difficulty || "normal";
+      const topicL = state.options?.topics?.[state.topic] || state.topic;
+      updatePills(topicL, "Práctica libre", diff);
+      el.newManualBtn.disabled = true;
+      try {
+        let subtypeVal = state.subtype || null, directionVal = null;
+        if (subtypeVal && subtypeVal.includes(":")) { const parts = subtypeVal.split(":", 2); subtypeVal = parts[0] || null; directionVal = parts[1] || null; }
+        const payload = { topic: state.topic, subtype: subtypeVal, difficulty: diff };
+        if (directionVal) payload.direction = directionVal;
+        if (state.seenFingerprints.length > 0) payload.seen_fingerprints = [...state.seenFingerprints];
+        
+        const data = await api("/api/exercise", payload);
+        state.currentExercise = data.exercise;
+        trackExercise(state.currentExercise);
+        renderExercise(); el.answerInput.focus(); renderFeedback("Escribe tu respuesta y presiona Revisar.");
+      } catch (err) { renderFeedback(`No se pudo generar la pregunta: ${escapeHtml(err.message)}`, "wrong"); } 
+      finally { el.newManualBtn.disabled = false; }
+    }
+
+    function renderExamQuestion() {
+      state.currentExercise = state.exam.questions[state.examIndex]; state.checkedCurrent = false; el.answerInput.value = ""; updatePreview();
+      el.showAnswerBtn.style.display = "none";
+      const total = state.exam.questions.length, cur = state.examIndex + 1, diff = state.exam?.difficulty || "normal";
+      updatePills(state.exam.topic_label, `Pregunta ${cur} de ${total}`, diff);
+      renderFeedback("Escribe tu respuesta y presiona Revisar."); renderQuestion(state.currentExercise); el.answerInput.focus();
+    }
+
+    async function startExam() {
+      const topic = el.examTopicSelect.value || "factorizacion";
+      const maxQ = Number(state.options?.maxQuestions) || 50;
+      const quantity = Math.max(1, Math.min(maxQ, Number(el.examQuantityInput.value || 10)));
+      el.startExamBtn.disabled = true; renderFeedback("Generando examen…");
+      try {
+        const payload = { topic, quantity, difficulty: state.examDifficulty || "normal" };
+        const data = await api("/api/exam", payload);
+        state.mode = "exam"; state.exam = data.exam;
+        state.examIndex = state.examCorrect = state.examAnswered = 0; state.correct = state.attempts = 0;
+        state.currentExercise = null; state.checkedCurrent = false; state.examLog = []; state.seenFingerprints = [];
+        el.showAnswerBtn.style.display = "none"; renderScore(); renderExamQuestion();
+        toast(`Examen iniciado: ${quantity} preguntas`, "ok");
+      } catch (err) { renderFeedback(`No se pudo iniciar el examen: ${escapeHtml(err.message)}`, "wrong"); } 
+      finally { el.startExamBtn.disabled = false; }
+    }
+
+    function finishExam() {
+      const total = state.exam?.questions?.length || 0;
+      const grade = total ? Math.round(state.examCorrect / total * 1000) / 10 : 0;
+      state.currentExercise = null; el.examPill.textContent = "Examen terminado"; el.showAnswerBtn.style.display = "none";
+      const rows = state.examLog.map((entry, i) => {
+        const q = entry.question, meta = q.metadata || {}, subLabel = escapeHtml(subtypeLabel(q.subtype));
+        const stmt = escapeHtml(q.statement || ""), disp = q.display?.plain ? escapeHtml(q.display.plain) : stmt;
+        const userAns = escapeHtml(entry.userAnswer), expAns = escapeHtml(entry.expected), ok = entry.correct;
+        const mark = ok ? `<span class="res-mark ok">✓</span>` : `<span class="res-mark bad">✗</span>`;
+        function renderCorrectAns(latex, plainFallback) { return latex ? `<div>\\[${latex}\\]</div>` : `<span class="res-correct-ans">${escapeHtml(plainFallback)}</span>`; }
+        let correctCell;
+        if (q.subtype === "division_sintetica") {
+          const roots = meta.roots ? meta.roots.join(", ") : entry.expected, factored = meta.factored || "—", prop = meta.property || "";
+          if (prop === "zeros") correctCell = `<span class="res-correct-ans">${escapeHtml(roots)}</span><br><small style="color:var(--muted)">Factorizado: ${escapeHtml(factored)}</small>`;
+          else correctCell = `<span class="res-correct-ans">${escapeHtml(factored)}</span><br><small style="color:var(--muted)">Ceros: ${escapeHtml(roots)}</small>`;
+        } else { correctCell = renderCorrectAns(entry.expectedLatex, entry.expected); }
+        return `<tr class="${ok ? "row-correct" : "row-wrong"}"><td style="text-align:center;width:32px">${mark}</td><td style="width:22px;color:var(--muted);font-weight:700">${i + 1}</td><td>${escapeHtml(subLabel)}</td><td style="max-width:220px;word-break:break-word">${disp}</td><td class="${ok ? "res-correct-ans" : "res-wrong-ans"}">${userAns}</td><td>${correctCell}</td></tr>`;
+      }).join("");
+      const skipped = total - state.examLog.length;
+      const skipRow = skipped > 0 ? `<tr><td colspan="6" style="text-align:center;color:var(--muted);font-style:italic;padding:6px">${skipped} pregunta(s) sin respuesta registrada</td></tr>` : "";
+      el.questionArea.className = "exam-summary";
+      el.questionArea.innerHTML = `<div><h2 style="margin:0 0 4px;font-size:17px">Resultado del examen</h2><p style="margin:0;font-size:13px"><strong>${state.examCorrect}</strong> correctas de <strong>${total}</strong> &nbsp;·&nbsp; Nota: <strong>${grade}%</strong></p></div><div style="overflow-x:auto"><table class="exam-results-table"><thead><tr><th></th><th>#</th><th>Subtipo</th><th>Pregunta</th><th>Tu respuesta</th><th>Correcta</th></tr></thead><tbody>${rows}${skipRow}</tbody></table></div><p class="mini-help">Puedes descargar el PDF del examen con el botón PDF.</p>`;
+      renderFeedback("Examen terminado. Revisa tus respuestas arriba.", "correct");
+      if (window.MathJax?.typesetPromise) window.MathJax.typesetPromise([el.questionArea]).catch(()=>{});
+    }
+
+    function nextQuestion() {
+      if (state.mode === "exam" && state.exam) {
+        if (!state.checkedCurrent) { renderFeedback("En examen primero revisa tu respuesta.", "wrong"); return; }
+        if (state.examIndex + 1 >= state.exam.questions.length) { finishExam(); return; }
+        state.examIndex++; renderExamQuestion(); return;
+      }
+      newExercise();
+    }
+
+    async function checkAnswer() {
+      if (!state.currentExercise) { renderFeedback("Primero genera una pregunta.", "wrong"); return; }
+      const raw = el.answerInput.value.trim();
+      if (!raw) { renderFeedback("Escribe una respuesta antes de revisar.", "wrong"); return; }
+      const answer = addImplicitMul(raw);
+      el.checkBtn.disabled = true;
+      try {
+        const data = await api("/api/check", { exercise: state.currentExercise, answer });
+        const result = data.result || {};
+        const expectedFormatted = formatExpected(result.expected, state.currentExercise.answer);
+        if (!state.checkedCurrent) {
+          if (state.mode === "exam") {
+            state.examAnswered++; if (result.correct) state.examCorrect++;
+            state.correct = state.examCorrect; state.attempts = state.examAnswered;
+            state.examLog.push({ question: state.currentExercise, userAnswer: answer, correct: result.correct, expected: expectedFormatted, expectedLatex: answerLatex(state.currentExercise.answer) });
+          } else { state.attempts++; if (result.correct) state.correct++; }
+          state.checkedCurrent = true; renderScore();
+        }
+        if (result.correct) { renderFeedback(state.mode==="exam" ? "Correcto. Avanza cuando estés listo." : "Correcto. Pide la siguiente.", "correct"); } 
+        else {
+          const lat = answerLatex(state.currentExercise.answer);
+          const expPlain = escapeHtml(expectedFormatted);
+          const expRendered = lat ? `<div>\\[${lat}\\]</div><code>${expPlain}</code>` : `<strong>${expPlain}</strong>`;
+          renderFeedback(`${escapeHtml(result.message || "No coincide todavía.")}<div class="answer-key">Respuesta correcta: ${expRendered}</div>`, "wrong");
+          if (window.MathJax?.typesetPromise) window.MathJax.typesetPromise([el.feedback]).catch(()=>{});
+        }
+      } catch (err) { renderFeedback(`Error al validar: ${escapeHtml(err.message)}`, "wrong"); } 
+      finally { el.checkBtn.disabled = false; }
+    }
+
+    function showAnswer() {
+      if (!state.currentExercise) { renderFeedback("Primero genera una pregunta.", "wrong"); return; }
+      const plain = escapeHtml(formatExpected(undefined, state.currentExercise.answer)), latex = answerLatex(state.currentExercise.answer);
+      const rendered = latex ? `<div>\\[${latex}\\]</div><code>${plain}</code>` : `<strong>${plain}</strong>`;
+      renderFeedback(`Respuesta correcta:<div class="answer-key">${rendered}</div>`);
+      if (window.MathJax?.typesetPromise) window.MathJax.typesetPromise([el.feedback]).catch(()=>{});
+    }
+
+    // DESCARGA DE PDF VÍA BACKEND HTTP
+    // El backend genera el PDF en memoria y devuelve una URL de descarga real
+    // (token de un solo uso, expira a los 60s). iOS Safari, WebViews y PWAs en
+    // modo standalone no soportan bien URL.createObjectURL + <a download>, así
+    // que en esos casos usamos window.open() con la URL directa; en el resto
+    // (Chrome, Firefox, Edge, Android) usamos fetch + blob para forzar la
+    // descarga automática con el nombre de archivo correcto.
+    async function downloadPdf() {
+      if (!state.exam) { renderFeedback("Primero inicia un examen para generar el PDF.", "wrong"); return; }
+      el.pdfBtn.disabled = true; renderFeedback("Generando archivo PDF...", "");
+      try {
+        const data = await api("/api/exam/pdf", { exam: state.exam, include_answer_key: true });
+        const base = String(window.BACKEND_URL || "").replace(/\/+$/, "");
+        const downloadUrl = `${base}${data.download_url}`;
+
+        const isIos    = /iP(hone|ad|od)/i.test(navigator.userAgent);
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        const isPwa    = window.matchMedia("(display-mode: standalone)").matches
+                         || window.navigator.standalone === true;
+
+        if (isIos || (isSafari && !isPwa)) {
+          // iOS Safari: window.open con la URL directa — el visor de PDFs nativo se encarga.
+          window.open(downloadUrl, "_blank");
+        } else {
+          const pdfRes = await fetch(downloadUrl);
+          if (!pdfRes.ok) throw new Error("No se pudo obtener el PDF.");
+          const blob = await pdfRes.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = data.filename || "Examen.pdf";
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 5000);
+        }
+
+        renderFeedback("PDF generado y descargado.", "correct");
+        toast("PDF descargado correctamente.", "ok");
+      } catch (err) {
+        renderFeedback(`No se pudo generar el PDF: ${escapeHtml(err.message)}`, "wrong");
+      } finally {
+        el.pdfBtn.disabled = false;
+      }
+    }
+
+    function toast(msg, kind = "") {
+      let zone = document.getElementById("toastZone");
+      if (!zone) { zone = Object.assign(document.createElement("div"), { id:"toastZone" }); Object.assign(zone.style, { position:"fixed", top:"20px", right:"20px", zIndex:"9999", display:"flex", flexDirection:"column", gap:"8px" }); document.body.appendChild(zone); }
+      const t = document.createElement("div");
+      t.style.cssText = `background:${kind==="ok"?"#ecfdf3":"#fff1f0"};border:1px solid ${kind==="ok"?"#abd9bf":"#f4b8b2"};color:${kind==="ok"?"#137a4b":"#b42318"};padding:10px 16px;border-radius:10px;font-weight:700;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,.12)`;
+      t.textContent = msg; zone.appendChild(t); setTimeout(()=>t.remove(), 3000);
+    }
+
+    async function init() {
+      try {
+        renderFeedback("Conectando con el servidor…");
+        state.options = await api("/api/options");
+        populateOptions(state.options);
+        renderKeypad(); renderScore();
+        updatePills(state.options?.topics?.[state.topic]||state.topic, "Práctica libre");
+        renderFeedback("Escribe tu respuesta y presiona Revisar.");
+        renderExercise();
+      } catch (err) {
+        renderFeedback(
+          `No pude conectar con el servidor: ${escapeHtml(err.message)}<div class="answer-key">` +
+          `Si el servidor estaba "dormido" (hosting gratuito), espera unos segundos y ` +
+          `<button type="button" id="retryInitBtn" style="margin-left:6px">Reintentar</button></div>`,
+          "wrong"
+        );
+        document.getElementById("retryInitBtn")?.addEventListener("click", init);
+      }
+    }
+
+    el.topicSelect.addEventListener("change", () => { populateSubtypes(); updatePills(state.options?.topics?.[el.topicSelect.value]||el.topicSelect.value,"Práctica libre"); });
+    el.subtypeSelect.addEventListener("change", () => { state.subtype = el.subtypeSelect.value||""; });
+    el.newManualBtn.addEventListener("click", () => newExercise());
+    el.startExamBtn.addEventListener("click", startExam);
+    el.checkBtn.addEventListener("click", checkAnswer);
+    el.showAnswerBtn.addEventListener("click", showAnswer);
+    el.nextBtn.addEventListener("click", nextQuestion);
+    el.pdfBtn.addEventListener("click", downloadPdf);
+    el.answerInput.addEventListener("keydown", e => { if (e.key==="Enter"&&!e.shiftKey) { e.preventDefault(); checkAnswer(); } });
+    el.answerInput.addEventListener("input", updatePreview);
+
+    init();
+  </script>
+</body>
+</html>

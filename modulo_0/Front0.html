@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Modulo 0 - Practica</title>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [["\\(","\\)"], ["$","$"]], displayMath: [["\\[","\\]"]] },
+      svg: { fontCache: "global" },
+      startup: { typeset: false }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    :root {
+      --ink: #18202f;
+      --muted: #667085;
+      --panel: #ffffff;
+      --soft: #f4f7fb;
+      --line: #d9e1ea;
+      --brand: #124b68;
+      --brand2: #0b6b6f;
+      --accent: #c27a2c;
+      --good: #137a4b;
+      --bad: #b42318;
+      --gold: #c27a2c;
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left,  #dfefff 0, transparent 35%),
+        radial-gradient(circle at top right, #e7fff7 0, transparent 30%),
+        linear-gradient(180deg, #eef5f7 0%, #f8fafc 42%, #fff 100%);
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(135deg, #0f172a, #124b68 55%, #0b6b6f);
+      color: white;
+      padding: 20px clamp(18px, 4vw, 56px);
+      border-bottom: 4px solid var(--accent);
+      box-shadow: 0 10px 30px rgba(15,23,42,.18);
+    }
+    .top {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+    h1 { margin:0; font-size:clamp(20px,2.6vw,32px); font-weight:800; letter-spacing:0; }
+    .subtitle { margin:6px 0 0; color:rgba(255,255,255,.8); font-size:13px; }
+    .score { min-width:230px; text-align:right; font-weight:700; font-size:14px; display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    .metric {
+      color:rgba(255,255,255,.82);
+      font-size:12px;
+      font-weight:700;
+    }
+    .metric strong { display:inline; color:white; font-size:15px; line-height:1.1; }
+    main {
+      max-width:1240px; margin:0 auto; padding:18px clamp(14px,3vw,42px) 48px;
+      display:grid; grid-template-columns:270px minmax(0,1fr); gap:16px;
+    }
+    .side, .surface, .answer-zone, .question-card {
+      background:rgba(255,255,255,.9);
+      border:1px solid rgba(217,225,234,.9);
+      box-shadow:0 16px 40px rgba(24,32,47,.10);
+      border-radius:16px;
+      backdrop-filter:blur(8px);
+    }
+    .side { padding:14px; align-self:start; position:sticky; top:14px; }
+    .surface { min-height:600px; padding:clamp(14px,2.5vw,24px); display:grid; grid-template-rows:auto 1fr auto; gap:14px; }
+    .sec-title {
+      margin:0 0 8px; color:var(--muted); font-size:10.5px; font-weight:900;
+      text-transform:uppercase; letter-spacing:.05em;
+    }
+    button, select, input, textarea { font:inherit; }
+    button {
+      border:1px solid var(--line); border-radius:8px; background:white; color:var(--ink);
+      min-height:38px; padding:9px 11px; cursor:pointer; font-weight:800;
+      transition:transform .12s, border-color .12s, background .12s, color .12s;
+    }
+    button:hover { transform:translateY(-1px); border-color:var(--brand); background:#f0f7ff; color:var(--brand); }
+    button:disabled { opacity:.55; cursor:not-allowed; }
+
+    button.primary  { background: var(--brand); color: white; border-color: var(--brand); font-weight: 800; }
+    button.accent   { background: #fff7ed; color: #8a4b10; border-color: #f4c38a; font-weight: 800; }
+    button.good     { background: #ecfdf3; color: var(--good); border-color: #abd9bf; font-weight: 800; }
+    button.danger   { background: #fff1f0; color: var(--bad);  border-color: #f4b8b2; font-weight: 800; }
+
+    .quick-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:16px; }
+    .quick { text-align:center; background:var(--soft); white-space:normal; line-height:1.2; font-size:12.5px; padding:8px 6px; }
+    .quick.active { background:var(--brand); border-color:var(--brand); color:white; }
+    label { display:grid; gap:5px; margin:8px 0; color:var(--muted); font-size:12px; font-weight:700; }
+    select, input[type=number] {
+      width:100%; min-height:38px; border:1px solid var(--line); border-radius:8px;
+      background:#fff; color:var(--ink); padding:9px 12px; outline:none;
+      box-shadow:0 1px 2px rgba(16,24,40,.04);
+    }
+    select:focus, input:focus, textarea:focus { border-color:var(--brand); box-shadow:0 0 0 3px rgba(18,75,104,.15); }
+    .difficulty-row { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin:8px 0 14px; }
+    .difficulty-row button { padding:7px 5px; font-size:11.5px; }
+    .difficulty-row button.active { background:var(--brand); color:#fff; border-color:var(--brand); }
+    .exam-box { margin-top:14px; padding-top:13px; border-top:1px solid var(--line); }
+    .exam-grid { display:grid; grid-template-columns:1fr 86px; gap:8px; align-items:end; }
+    .status-row { display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+    .pill {
+      display:inline-flex; align-items:center; min-height:28px;
+      border:1px solid var(--line); border-radius:999px; background:var(--soft);
+      padding:4px 10px; color:var(--muted); font-size:11.5px; font-weight:800;
+    }
+    .empty {
+      min-height:340px; display:grid; place-items:center; text-align:center;
+      border:1px dashed var(--line); border-radius:8px; background:#fff; color:var(--muted); padding:20px;
+    }
+    .question-card {
+      padding:clamp(14px,2.5vw,22px);
+      display:grid; gap:10px; align-self:start;
+      background:linear-gradient(180deg,#fff 0%,#fbfcfe 100%);
+      box-shadow:0 12px 28px rgba(24,32,47,.07);
+      border-radius:14px;
+    }
+    .q-info { margin:0; color:var(--muted); font-size:12px; font-weight:800; }
+    .timer-wrap { height:7px; border-radius:999px; background:var(--line); overflow:hidden; }
+    .timer-bar { height:100%; background:var(--brand); transition:width .25s linear; }
+    .timer-bar.warn { background:var(--gold); }
+    .timer-bar.crit { background:var(--bad); }
+    .timer-label { text-align:right; color:var(--muted); font-size:11px; font-weight:900; }
+    .math-box {
+      min-height:90px; display:grid; place-items:center; overflow-x:auto;
+      border:1.5px solid var(--line); border-radius:12px; background:var(--soft); padding:18px 20px;
+    }
+    .math-box.mental { min-height:120px; background:#f0f7ff; border-color:#b8d4ef; }
+    .math-render { width:100%; text-align:center; font-size:clamp(20px,2.4vw,28px); overflow-x:auto; }
+    .math-box.mental .math-render { font-size:clamp(26px,4vw,44px); }
+    .plain-fallback {
+      display:block; margin-top:8px; color:var(--muted); font-size:11px;
+      white-space:normal; word-break:break-word; text-align:center;
+    }
+    .q-instructions { margin:0; color:var(--brand); font-size:12px; font-weight:800; }
+    .answer-zone { padding:14px; display:grid; gap:10px; background:linear-gradient(180deg,#fff 0%,#f8fbff 100%); }
+    #livePreview { min-height:44px; border-bottom:1px dashed var(--line); color:var(--brand); overflow-x:auto; padding-bottom:8px; }
+    textarea {
+      width:100%; min-height:130px; resize:vertical; border:1px solid var(--line);
+      border-radius:12px; padding:12px 14px; outline:none; line-height:1.5; font-size:15px;
+    }
+    textarea:disabled { background:#f2f4f7; color:#98a2b3; resize:none; }
+    .keypad { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:6px; padding:10px; border:1px solid var(--line); border-radius:12px; background:#fbfdff; }
+    .keypad button { min-height:32px; padding:5px 4px; font-size:11.5px; border-radius:8px; }
+    .btn-row { display:flex; gap:9px; flex-wrap:wrap; }
+    .btn-row button { padding:9px 13px; border-radius:10px; box-shadow:0 6px 14px rgba(24,32,47,.07); }
+    .feedback {
+      min-height:50px; border:1px dashed var(--line); border-radius:12px;
+      padding:12px; background:#fff; font-size:13.5px; line-height:1.45;
+    }
+    
+    .feedback.correct { color: var(--good); border-color: #a6d8bd; background: #f0fff6; font-weight: 800; border-style: solid; }
+    .feedback.wrong   { color: var(--bad);  border-color: #f0b8b0; background: #fff6f5; font-weight: 800; border-style: solid; }
+
+    .answer-key { margin-top:8px; padding-top:8px; border-top:1px solid var(--line); color:var(--ink); font-weight:800; }
+    .exam-banner { border:1px solid #f4c38a; background:#fff7ed; color:#8a4b10; border-radius:12px; padding:10px 12px; font-size:13px; font-weight:800; }
+    .summary { display:grid; gap:14px; align-self:start; border:1px solid var(--line); border-radius:10px; background:#fff; padding:16px; overflow-y:auto; }
+    .summary-grid { display:grid; grid-template-columns:repeat(4,minmax(120px,1fr)); gap:8px; }
+    .summary-card { border:1px solid var(--line); border-radius:8px; padding:12px; background:var(--soft); }
+    .summary-card strong { display:block; font-size:26px; color:var(--ink); }
+    .answers-table { width:100%; border-collapse:collapse; font-size:12px; }
+    .answers-table th, .answers-table td { padding:8px; border-bottom:1px solid var(--line); vertical-align:top; text-align:left; }
+    .answers-table th { background:var(--soft); color:var(--muted); font-size:11px; text-transform:uppercase; }
+    .answers-table tr.ok td { background:#f7fff9; }
+    .answers-table tr.err td { background:#fff8f7; }
+    @media (max-width:880px) {
+      main { grid-template-columns:1fr; }
+      .side { position:static; }
+      .summary-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .keypad { grid-template-columns:repeat(4,minmax(0,1fr)); }
+    }
+
+    .btn-volver {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    color: #124b68;
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px; /* Padding igualado para que el botón se vea cuadradito */
+    background-color: #ffffff;
+    border: 1px solid #d9e1ea;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(24, 32, 47, 0.08);
+    transition: all 0.3s ease; /* Transición suave */
+    overflow: hidden; /* Oculta lo que sobresale */
+    }
+
+    .btn-volver:hover {
+        background-color: #f0f7ff;
+        border-color: #124b68;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(18, 75, 104, 0.15);
+        padding: 10px 16px; /* Al expandirse, recupera el padding horizontal */
+    }
+
+    /* Estado inicial del texto: Oculto y sin ancho */
+    .btn-texto {
+        max-width: 0;
+        opacity: 0;
+        margin-left: 0;
+        white-space: nowrap; /* Evita que el texto salte de línea al animarse */
+        transition: all 0.3s ease; /* Misma duración que el hover del botón */
+    }
+
+    /* Estado al hacer hover: Aparece el texto y se separa del ícono */
+    .btn-volver:hover .btn-texto {
+        max-width: 150px; /* Espacio suficiente para "Volver al Menú" */
+        opacity: 1;
+        margin-left: 8px; /* Esto reemplaza el antiguo 'gap' */
+    }
+
+  </style>
+</head>
+<body>
+
+  
+
+
+  <header>
+    <div class="top">
+
+      <a href="Menu-Principal.html" class="btn-volver">
+          <!-- Ícono de flecha SVG -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span class="btn-texto">Volver al Menú</span>
+      </a>
+
+
+      <div>
+        <h1>Modulo 0 - Practica rapida</h1>
+        <p class="subtitle">Elige un modo, responde y revisa al instante.</p>
+      </div>
+      <div class="score">
+        <div class="metric"><strong id="correctMetric">0</strong> correctas</div>
+        <div class="metric"><strong id="attemptMetric">0</strong> intentos</div>
+        <div class="metric"><strong id="pointMetric">0</strong> puntos</div>
+      </div>
+    </div>
+  </header>
+  <main>
+    <aside class="side">
+      <p class="sec-title">Temas</p>
+      <div class="quick-grid" id="quickGrid"></div>
+
+      <p class="sec-title">Practica</p>
+      <label>Tema <select id="topicSel"></select></label>
+      <label>Subtema <select id="subSel"></select></label>
+      <div class="difficulty-row" id="difficultyRow"></div>
+      <button class="primary" id="newBtn" style="width:100%">Nueva pregunta</button>
+
+      <div class="exam-box">
+        <p class="sec-title">Examen</p>
+        <label>Tema <select id="examTopicSel"></select></label>
+        <div class="difficulty-row" id="examDifficultyRow"></div>
+        <div class="exam-grid">
+          <label>Preguntas <input id="examCount" type="number" min="1" max="50" value="10"></label>
+          <button class="danger" id="startExamBtn">Iniciar</button>
+        </div>
+      </div>
+    </aside>
+
+    <section class="surface">
+      <div class="status-row">
+        <span class="pill" id="topicPill">Modulo 0</span>
+        <span class="pill" id="sessionPill">Practica libre</span>
+      </div>
+      <div id="questionArea" class="empty">
+        <div>
+          <strong>Elige un tema para comenzar.</strong>
+          <p>Selecciona dificultad y genera una pregunta.</p>
+        </div>
+      </div>
+      
+      <!-- Zona de respuesta REESTRUCTURADA -->
+      <div class="answer-zone">
+        <div id="livePreview"></div>
+        <textarea id="answerInput" rows="3" placeholder="Ej: 3/4, x**2+1, sqrt(2), q=x+1; r=2"></textarea>
+        
+        <div class="btn-row">
+          <button class="good" id="checkBtn">Revisar</button>
+          <button class="accent" id="showAnsBtn">Respuesta</button>
+          <button id="nextBtn">Siguiente</button>
+          <button class="primary" id="pdfBtn">PDF</button>
+        </div>
+        
+        <div id="feedback" class="feedback">Listo para practicar.</div>
+        
+        <div class="keypad" id="keypad"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+  const S = {
+    options:null, question:null, topic:"agilidad_mental", subtopic:"",
+    difficulty:"normal", examDifficulty:"normal", exam:null, examIdx:0,
+    correct:0, attempts:0, points:0, checked:false,
+    timerHandle:null, timerLeft:0, timerTotal:0, startedAt:0,
+    examAnswers:[], adaptiveEvents:[]
+  };
+  const E = {
+    quickGrid:document.getElementById("quickGrid"),
+    topicSel:document.getElementById("topicSel"),
+    subSel:document.getElementById("subSel"),
+    difficultyRow:document.getElementById("difficultyRow"),
+    examDifficultyRow:document.getElementById("examDifficultyRow"),
+    examTopicSel:document.getElementById("examTopicSel"),
+    examCount:document.getElementById("examCount"),
+    startExamBtn:document.getElementById("startExamBtn"),
+    newBtn:document.getElementById("newBtn"),
+    questionArea:document.getElementById("questionArea"),
+    answerInput:document.getElementById("answerInput"),
+    keypad:document.getElementById("keypad"),
+    checkBtn:document.getElementById("checkBtn"),
+    showAnsBtn:document.getElementById("showAnsBtn"),
+    nextBtn:document.getElementById("nextBtn"),
+    pdfBtn:document.getElementById("pdfBtn"),
+    feedback:document.getElementById("feedback"),
+    correctMetric:document.getElementById("correctMetric"),
+    attemptMetric:document.getElementById("attemptMetric"),
+    pointMetric:document.getElementById("pointMetric"),
+    topicPill:document.getElementById("topicPill"),
+    sessionPill:document.getElementById("sessionPill"),
+    livePreview:document.getElementById("livePreview")
+  };
+  const esc = v => String(v ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+  
+  const API_BASE = "http://127.0.0.1:8765";
+  
+  const apiUrl = path => API_BASE ? `${API_BASE}${path}` : path;
+  async function api(path, body=null) {
+    const opts = body ? {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)} : {};
+    const res = await fetch(apiUrl(path), opts);
+    const text = await res.text();
+    let data = {};
+    try { data = text ? JSON.parse(text) : {}; } catch (_) { throw new Error(`Respuesta no JSON (${res.status})`); }
+    if (!res.ok || data.error || data.ok === false) throw new Error(data.error || "Error");
+    return data;
+  }
+  const unwrapQuestion = data => data.question || data.exercise || data;
+  const unwrapExam = data => data.exam || data;
+  const unwrapResult = data => data.result || data;
+  const unwrapExplanation = data => data.explanation || data;
+
+  function setFeedback(html, cls="") { E.feedback.className = `feedback ${cls}`; E.feedback.innerHTML = html; }
+  function toast(msg, ok=true) {
+    let zone = document.getElementById("toastZone");
+    if (!zone) {
+      zone = Object.assign(document.createElement("div"), { id:"toastZone" });
+      Object.assign(zone.style, { position:"fixed", top:"20px", right:"20px", zIndex:"9999", display:"flex", flexDirection:"column", gap:"8px" });
+      document.body.appendChild(zone);
+    }
+    const item = document.createElement("div");
+    item.style.cssText = `background:${ok ? "#ecfdf3" : "#fff1f0"};border:1px solid ${ok ? "#abd9bf" : "#f4b8b2"};color:${ok ? "#137a4b" : "#b42318"};padding:10px 16px;border-radius:10px;font-weight:700;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,.12)`;
+    item.textContent = msg;
+    zone.appendChild(item);
+    setTimeout(() => item.remove(), 3000);
+  }
+  function updateScore() {
+    E.correctMetric.textContent = S.correct;
+    E.attemptMetric.textContent = S.attempts;
+    E.pointMetric.textContent = S.points;
+  }
+  function setPills(topic, session) { E.topicPill.textContent = topic; E.sessionPill.textContent = session; }
+  function typeset(el) {
+    if (!window.MathJax?.typesetPromise) return;
+    try { window.MathJax.typesetClear?.([el]); } catch (_) {}
+    window.MathJax.typesetPromise([el]).catch(() => {});
+  }
+  function sympyToLatex(s) {
+    return String(s || "")
+      .replace(/\*\*/g,"^").replace(/Rational\(\s*([^,]+)\s*,\s*([^)]+)\)/g,"\\frac{$1}{$2}")
+      .replace(/sqrt\(([^)]+)\)/g,"\\sqrt{$1}").replace(/root\(([^,]+),([^)]+)\)/g,"\\sqrt[$2]{$1}")
+      .replace(/Abs\(([^)]+)\)/g,"|$1|").replace(/\boo\b/g,"\\infty").replace(/\bpi\b/g,"\\pi")
+      .replace(/<=/g,"\\le ").replace(/>=/g,"\\ge ").replace(/\*/g,"\\cdot ")
+      .replace(/(\d+)\/(\d+)/g,"\\frac{$1}{$2}");
+  }
+  let previewFrame = 0;
+  function updatePreview() {
+    cancelAnimationFrame(previewFrame);
+    previewFrame = requestAnimationFrame(() => {
+      const raw = E.answerInput.value.trim();
+      if (!raw) { E.livePreview.innerHTML = ""; return; }
+      E.livePreview.innerHTML = `\\[${sympyToLatex(raw)}\\]`;
+      typeset(E.livePreview);
+    });
+  }
+  const KEYS = [
+    ["x","x"],["y","y"],["z","z"],["(", "("],[")", ")"],["/","/"],["^","**"],["sqrt","sqrt()",-1],
+    ["+","+"],["-","-"],["*","*"],["=","="],["<","<"],[">",">"],["q=;r=","q=; r="],["C","clear"],
+    ["x^2","**2"],["x^3","**3"],["1/2","Rational(1,2)"],["root","root(,)",-2],["pi","pi"],["oo","oo"],["back","back"]
+  ];
+  function buildKeypad() {
+    E.keypad.innerHTML = KEYS.map((k,i)=>`<button type="button" data-i="${i}">${esc(k[0])}</button>`).join("");
+    E.keypad.querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => {
+      const k = KEYS[+btn.dataset.i], action = k[1], input = E.answerInput;
+      if (action === "clear") { input.value = ""; input.focus(); updatePreview(); return; }
+      if (action === "back") {
+        const a = input.selectionStart ?? input.value.length, b = input.selectionEnd ?? input.value.length;
+        input.value = a !== b ? input.value.slice(0,a)+input.value.slice(b) : input.value.slice(0,Math.max(0,a-1))+input.value.slice(a);
+        const pos = Math.max(0, a - (a === b ? 1 : 0)); input.focus(); input.setSelectionRange(pos,pos); updatePreview(); return;
+      }
+      const a = input.selectionStart ?? input.value.length, b = input.selectionEnd ?? input.value.length;
+      input.value = input.value.slice(0,a) + action + input.value.slice(b);
+      const pos = a + action.length + (k[2] || 0);
+      input.focus(); input.setSelectionRange(Math.max(0,pos), Math.max(0,pos)); updatePreview();
+    }));
+  }
+  function lockInput(msg="") {
+    E.answerInput.disabled = true; E.checkBtn.disabled = true;
+    E.keypad.querySelectorAll("button").forEach(b => b.disabled = true);
+    if (msg) E.answerInput.placeholder = msg;
+  }
+  function unlockInput() {
+    E.answerInput.disabled = false; E.checkBtn.disabled = false;
+    E.keypad.querySelectorAll("button").forEach(b => b.disabled = false);
+    E.answerInput.placeholder = "Ej: 3/4, x**2+1, sqrt(2), q=x+1; r=2";
+  }
+  function stopTimer() { if (S.timerHandle) { clearInterval(S.timerHandle); S.timerHandle = null; } }
+  function startTimer(sec) {
+    stopTimer(); S.timerTotal = S.timerLeft = sec; timerUI();
+    S.timerHandle = setInterval(() => {
+      S.timerLeft = Math.max(0, S.timerLeft - 0.25); timerUI();
+      if (S.timerLeft <= 0 && !S.checked) { stopTimer(); markAttempt(false, "", true); lockInput("Tiempo agotado"); setFeedback("Tiempo agotado.", "wrong"); }
+    }, 250);
+  }
+  function timerUI() {
+    const bar = document.getElementById("timerBar"), label = document.getElementById("timerLabel");
+    if (!bar || !label) return;
+    const pct = S.timerTotal ? S.timerLeft / S.timerTotal * 100 : 0;
+    bar.style.width = `${pct}%`;
+    bar.className = "timer-bar" + (pct < 30 ? " crit" : pct < 55 ? " warn" : "");
+    label.textContent = `${Math.ceil(S.timerLeft)}s`;
+  }
+  function renderDisplay(q) {
+    const d = q.display || {};
+    if (d.format === "latex" && d.latex) return `<div class="math-render">\\[${d.latex}\\]</div><code class="plain-fallback">${esc(d.plain)}</code>`;
+    return `<div class="math-render">${esc(d.plain || q.prompt || "")}</div>`;
+  }
+  function renderQuestion(q) {
+    const meta = q.metadata || {}, hasTimer = meta.interactive && meta.seconds > 0;
+    const timerHtml = hasTimer ? `<div class="timer-wrap"><div class="timer-bar" id="timerBar"></div></div><div class="timer-label" id="timerLabel">${meta.seconds}s</div>` : "";
+    const examBanner = S.exam ? `<div class="exam-banner">Modo examen: responde, presiona Revisar y luego avanza.</div>` : "";
+    E.questionArea.className = "question-card";
+    E.questionArea.innerHTML = `
+      ${examBanner}
+      <p class="q-info">${esc(q.topicLabel)} / ${esc(q.subtopicLabel)} / ${esc(q.difficultyLabel || q.difficulty)}</p>
+      ${timerHtml}
+      <div class="math-box${q.topic === "agilidad_mental" ? " mental" : ""}">${renderDisplay(q)}</div>
+      <p class="q-instructions">${esc(q.instructions || "")}</p>`;
+    typeset(E.questionArea);
+    S.startedAt = performance.now();
+    if (hasTimer) startTimer(meta.seconds);
+    else { S.timerTotal = 0; S.timerLeft = 0; }
+  }
+  function difficultyButtons(container, stateKey) {
+    const diffs = S.options?.difficulties || [
+      {key:"facil", label:"Facil"}, {key:"normal", label:"Normal"}, {key:"avanzado", label:"Avanzado"}
+    ];
+    container.innerHTML = diffs.map(d => `<button type="button" data-diff="${esc(d.key)}">${esc(d.label)}</button>`).join("");
+    container.querySelectorAll("button").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.diff === S[stateKey]);
+      btn.addEventListener("click", () => {
+        S[stateKey] = btn.dataset.diff;
+        container.querySelectorAll("button").forEach(b => b.classList.toggle("active", b === btn));
+      });
+    });
+  }
+  function populateSubs() {
+    const topic = (S.options?.topics || []).find(t => t.key === E.topicSel.value);
+    E.subSel.innerHTML = ['<option value="">Aleatorio</option>', ...(topic?.subtopics || []).map(s => `<option value="${esc(s.key)}">${esc(s.label)}</option>`)].join("");
+    S.topic = E.topicSel.value; S.subtopic = "";
+  }
+  function populateOptions(opts) {
+    const topics = (opts.topics || []).map(t => `<option value="${esc(t.key)}">${esc(t.label)}</option>`).join("");
+    E.topicSel.innerHTML = topics; E.examTopicSel.innerHTML = topics;
+    E.topicSel.value = S.topic; E.examTopicSel.value = S.topic;
+    difficultyButtons(E.difficultyRow, "difficulty");
+    difficultyButtons(E.examDifficultyRow, "examDifficulty");
+    populateSubs();
+    E.quickGrid.innerHTML = (opts.quickTopics || []).map((m,i)=>`<button class="quick" data-i="${i}">${esc(m.label)}</button>`).join("");
+    E.quickGrid.querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => {
+      E.quickGrid.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const quickItem = opts.quickTopics[+btn.dataset.i];
+      S.topic = quickItem.topic || quickItem.key; S.difficulty = quickItem.difficulty || "avanzado";
+      E.topicSel.value = S.topic; populateSubs(); difficultyButtons(E.difficultyRow, "difficulty"); newQuestion();
+    }));
+  }
+  async function newQuestion() {
+    stopTimer(); S.exam = null; S.checked = false; unlockInput();
+    E.answerInput.value = ""; updatePreview(); E.showAnsBtn.style.display = ""; E.newBtn.disabled = true;
+    E.nextBtn.disabled = false;
+    setFeedback("Generando pregunta...");
+    const topicLabel = (S.options?.topics || []).find(t => t.key === S.topic)?.label || S.topic;
+    setPills(topicLabel, "Practica libre");
+    try {
+      const data = await api("/api/question", {topic:S.topic || null, subtopic:E.subSel.value || null, difficulty:S.difficulty, include_answer:true});
+      S.question = unwrapQuestion(data);
+      renderQuestion(S.question);
+      E.answerInput.focus();
+      setFeedback("Escribe tu respuesta y pulsa Revisar.");
+    } catch (err) { setFeedback(`No se pudo generar: ${esc(err.message)}`, "wrong"); }
+    finally { E.newBtn.disabled = false; }
+  }
+  function pointsFor(ok) {
+    if (!ok) return 0;
+    const meta = S.question?.metadata || {}, base = meta.basePoints || (S.question?.difficulty === "avanzado" ? 24 : S.question?.difficulty === "facil" ? 10 : 16);
+    if (!S.timerTotal) return base;
+    const ratio = Math.max(0, Math.min(1, S.timerLeft / S.timerTotal));
+    return Math.max(1, Math.round(base * (0.45 + 0.55 * ratio)));
+  }
+  function elapsed() { return Math.round(((performance.now() - S.startedAt) / 1000) * 10) / 10; }
+  function markAttempt(ok, answerText, timeout=false, result={}) {
+    if (S.checked || !S.question) return;
+    stopTimer(); S.checked = true; S.attempts++; if (ok) S.correct++;
+    const pts = pointsFor(ok); S.points += pts; updateScore();
+    const rec = {subtopic:S.question.subtopic, difficulty:S.question.difficulty, time:elapsed(), correct:!!ok};
+    S.adaptiveEvents.push(rec);
+    if (S.exam) {
+      S.examAnswers.push({
+        plain:(S.question.display?.plain || S.question.prompt || ""),
+        userAns:esc(answerText || ""),
+        expected:esc(result.expected || result.correctAnswer || result.respuestaCorrecta || S.question.answer?.plain || "-"),
+        correct:!!ok, time:rec.time, subtopic:S.question.subtopicLabel || S.question.subtopic,
+        difficulty:S.question.difficultyLabel || S.question.difficulty, errorType:result.errorType || (timeout ? "timeout" : "")
+      });
+    }
+  }
+  async function checkAnswer() {
+    if (!S.question) { setFeedback("Genera una pregunta primero.", "wrong"); return; }
+    const ans = E.answerInput.value.trim();
+    if (!ans) { setFeedback("Escribe una respuesta antes de revisar.", "wrong"); return; }
+    E.checkBtn.disabled = true;
+    try {
+      const data = await api("/api/validate", {token:S.question.token, answer:ans});
+      const result = unwrapResult(data), ok = result.correcto ?? result.correct ?? false;
+      markAttempt(ok, ans, false, result);
+      if (ok) {
+        setFeedback(`Correcto. +${pointsFor(true)} puntos`, "correct");
+      } else {
+        let extra = "";
+        try {
+          const ex = await api("/api/explain", {token:S.question.token, answer:ans});
+          const steps = (unwrapExplanation(ex).steps || []).map(s => `<div>${esc(s)}</div>`).join("");
+          extra = steps ? `<div class="answer-key">${steps}</div>` : "";
+        } catch (_) {}
+        const correctAns = result.expected || result.correctAnswer || result.respuestaCorrecta || S.question.answer?.plain || "";
+        setFeedback(`No coincide.<div class="answer-key">Respuesta correcta: ${esc(correctAns)}</div>${extra}`, "wrong");
+      }
+    } catch (err) { setFeedback(`Error al validar: ${esc(err.message)}`, "wrong"); }
+    finally { E.checkBtn.disabled = S.checked; }
+  }
+  function showAnswer() {
+    if (!S.question) { setFeedback("Genera una pregunta primero.", "wrong"); return; }
+    stopTimer();
+    const ans = S.question.answer || {};
+    markAttempt(false, E.answerInput.value.trim(), false, {correctAnswer:ans.plain});
+    const rendered = ans.latex ? `<div>\\[${ans.latex}\\]</div><code>${esc(ans.plain || "")}</code>` : `<strong>${esc(ans.plain || "-")}</strong>`;
+    setFeedback(`Respuesta correcta:<div class="answer-key">${rendered}</div>`);
+    typeset(E.feedback);
+  }
+  function renderExamQuestion() {
+    S.question = S.exam.questions[S.examIdx]; S.checked = false; unlockInput();
+    E.answerInput.value = ""; updatePreview();
+    setPills(S.exam.moduleLabel || "Modulo 0", `Pregunta ${S.examIdx + 1} de ${S.exam.questions.length}`);
+    E.nextBtn.disabled = false;
+    setFeedback("Modo examen activo: resuelve y revisa antes de avanzar.");
+    renderQuestion(S.question);
+    E.answerInput.focus();
+  }
+  async function startExam() {
+    const topic = E.examTopicSel.value || "agilidad_mental", count = Math.max(1, Math.min(50, +E.examCount.value || 10));
+    E.startExamBtn.disabled = true; setFeedback("Generando examen...");
+    try {
+      const data = await api("/api/exam", {topic, difficulty:S.examDifficulty, count, include_answers:true});
+      S.exam = unwrapExam(data); if (!Array.isArray(S.exam?.questions)) throw new Error("Respuesta de examen incompleta.");
+      S.examIdx = 0; S.examAnswers = []; S.adaptiveEvents = []; S.correct = S.attempts = S.points = 0; updateScore();
+      E.showAnsBtn.style.display = "none"; renderExamQuestion();
+      toast(`Modo examen iniciado: ${count} preguntas`, true);
+    } catch (err) { setFeedback(`No se pudo iniciar: ${esc(err.message)}`, "wrong"); }
+    finally { E.startExamBtn.disabled = false; }
+  }
+  function finishExam() {
+    stopTimer();
+    const total = S.exam?.questions?.length || 0, correct = S.examAnswers.filter(r => r.correct).length;
+    const score = total ? Math.round(correct / total * 1000) / 10 : 0;
+    const avg = S.examAnswers.length ? Math.round(S.examAnswers.reduce((a,b)=>a+(b.time||0),0)/S.examAnswers.length*10)/10 : 0;
+    const bySub = {};
+    S.examAnswers.forEach(r => { bySub[r.subtopic] ??= {total:0, correct:0}; bySub[r.subtopic].total++; if (r.correct) bySub[r.subtopic].correct++; });
+    const weak = Object.entries(bySub).filter(([,v]) => v.total >= 1 && v.correct / v.total < .7).map(([k]) => k);
+    S.exam.summary = {total, correct, score, averageTime:avg, weakSubtopics:weak, adaptiveReady:S.adaptiveEvents};
+    const rows = S.examAnswers.map((r,i)=>`<tr class="${r.correct ? "ok" : "err"}"><td>${i+1}</td><td>${esc(r.plain)}</td><td>${r.userAns || "<em>sin respuesta</em>"}</td><td>${r.expected}</td><td>${r.time}s</td><td>${r.correct ? "OK" : "Error"}</td></tr>`).join("");
+    E.questionArea.className = "summary";
+    E.questionArea.innerHTML = `
+      <div class="exam-banner">Modo examen terminado. Revisa tus estadisticas y errores antes de descargar el PDF.</div>
+      <div class="summary-grid">
+        <div class="summary-card"><strong>${correct}/${total}</strong> correctas</div>
+        <div class="summary-card"><strong>${score}%</strong> nota</div>
+        <div class="summary-card"><strong>${avg}s</strong> tiempo prom.</div>
+        <div class="summary-card"><strong>${weak.length || 0}</strong> temas debiles</div>
+      </div>
+      ${weak.length ? `<div class="feedback wrong">Temas debiles: ${weak.map(esc).join(", ")}</div>` : `<div class="feedback correct">Sin temas debiles claros en este examen.</div>`}
+      <div style="overflow-x:auto"><table class="answers-table"><thead><tr><th>#</th><th>Pregunta</th><th>Tu respuesta</th><th>Correcta</th><th>Tiempo</th><th>Estado</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    setFeedback(`Examen terminado. ${correct}/${total} - ${score}%.`, score >= 70 ? "correct" : "wrong");
+    E.showAnsBtn.style.display = ""; E.nextBtn.disabled = false; setPills("Modulo 0", "Examen terminado");
+  }
+  function nextQuestion() {
+    if (S.exam) {
+      if (!S.checked) { setFeedback("En modo examen primero revisa tu respuesta.", "wrong"); return; }
+      if (S.examIdx + 1 >= S.exam.questions.length) { finishExam(); return; }
+      S.examIdx++; renderExamQuestion(); return;
+    }
+    newQuestion();
+  }
+  async function downloadPdf() {
+    if (!S.exam) { setFeedback("Primero inicia un examen.", "wrong"); return; }
+    E.pdfBtn.disabled = true;
+    try {
+      const res = await fetch(apiUrl("/api/exam/pdf"), {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({exam:S.exam})});
+      if (!res.ok) { const d = await res.json().catch(()=>({})); throw new Error(d.error || "Error PDF"); }
+      const blob = await res.blob(), a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = `modulo0_examen_${S.exam.id || "nuevo"}.pdf`;
+      document.body.appendChild(a); a.click(); a.remove(); setFeedback("PDF descargado.", "correct");
+    } catch (err) { setFeedback(`Error al generar PDF: ${esc(err.message)}`, "wrong"); }
+    finally { E.pdfBtn.disabled = false; }
+  }
+  async function init() {
+    try {
+      S.options = await api("/api/options");
+      populateOptions(S.options); buildKeypad(); updateScore();
+      setPills("Modulo 0", "Practica libre"); setFeedback("Elige un tema para comenzar.");
+    } catch (err) { setFeedback(`No pude iniciar la app: ${esc(err.message)}`, "wrong"); }
+  }
+  E.topicSel.addEventListener("change", () => { populateSubs(); S.topic = E.topicSel.value; });
+  E.subSel.addEventListener("change", () => { S.subtopic = E.subSel.value; });
+  E.newBtn.addEventListener("click", newQuestion);
+  E.startExamBtn.addEventListener("click", startExam);
+  E.checkBtn.addEventListener("click", checkAnswer);
+  E.showAnsBtn.addEventListener("click", showAnswer);
+  E.nextBtn.addEventListener("click", nextQuestion);
+  E.pdfBtn.addEventListener("click", downloadPdf);
+  E.answerInput.addEventListener("input", updatePreview);
+  E.answerInput.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (S.question?.topic === "agilidad_mental") stopTimer();
+      checkAnswer();
+    }
+  });
+  init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<!-- Start-Process python Back0.py; Start-Process python backend1.py; Start-Process python Graficadora_Back.py; Start-Process python Factorizadora_Back.py -->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Teorema – Menú principal</title>
+    <style>
+        :root {
+            --ink: #18202f;
+            --muted: #667085;
+            --panel: #ffffff;
+            --soft: #f4f7fb;
+            --line: #d9e1ea;
+            --brand: #124b68;
+            --brand-2: #0b6b6f;
+            --accent: #c27a2c;
+            --good: #137a4b;
+            --bad: #b42318;
+        }
+        
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at top left,  #dfefff 0, transparent 35%),
+                radial-gradient(circle at top right, #e7fff7 0, transparent 30%),
+                linear-gradient(180deg, #eef5f7 0%, #f8fafc 42%, #fff 100%);
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0f172a, #124b68 55%, #0b6b6f);
+            color: white;
+            padding: 20px clamp(18px, 4vw, 56px);
+            border-bottom: 4px solid var(--accent);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, .18);
+        }
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            max-width: 1180px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+        h1 { margin: 0; font-size: clamp(20px, 2.6vw, 32px); font-weight: 800; }
+        .subtitle { margin: 6px 0 0; color: rgba(255,255,255,.8); font-size: 13px; }
+
+        .settings-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid rgba(255,255,255,.28);
+            background: rgba(255,255,255,.08);
+            color: #fff;
+            border-radius: 10px;
+            padding: 8px 14px;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .12s, background .12s;
+        }
+        .settings-btn:hover { transform: translateY(-1px); background: rgba(255,255,255,.18); }
+
+        main {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 18px clamp(14px, 3vw, 42px) 48px;
+            display: grid;
+            grid-template-columns: 270px minmax(0, 1fr);
+            gap: 16px;
+        }
+        .panel {
+            background: rgba(255,255,255,.9);
+            border: 1px solid rgba(217,225,234,.9);
+            box-shadow: 0 16px 40px rgba(24,32,47,.10);
+            border-radius: 16px;
+            backdrop-filter: blur(8px);
+        }
+
+        .side {
+            padding: 14px;
+            align-self: start;
+            position: sticky;
+            top: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .section-title {
+            margin: 0 0 8px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--muted);
+        }
+
+        button { font: inherit; }
+        .nav-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            border: 1px solid var(--line);
+            background: white;
+            color: var(--ink);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .12s, border-color .12s, background .12s, color .12s;
+        }
+        .nav-btn:hover { transform: translateY(-1px); border-color: var(--brand); background: #f0f7ff; color: var(--brand); }
+        .nav-btn.active { background: var(--brand); color: white; border-color: var(--brand); }
+
+        .workspace { padding: clamp(14px, 2.5vw, 24px); }
+
+        .empty {
+            min-height: 320px;
+            display: grid;
+            place-items: center;
+            color: var(--muted);
+            text-align: center;
+            border: 1px dashed var(--line);
+            border-radius: 10px;
+            background: #fff;
+            padding: 24px;
+        }
+        .empty strong { color: var(--ink); font-size: 15px; }
+        .empty p { margin: 6px 0 0; font-size: 13px; }
+
+        .empty[hidden] { display: none; }
+
+        .cards { display: flex; flex-wrap: wrap; gap: 16px; }
+        .cards[hidden] { display: none; }
+        .cards.entering { animation: fadeUp .2s ease both; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            width: 160px;
+            height: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            cursor: pointer;
+            user-select: none;
+            transition: transform .12s, border-color .12s, background .12s, box-shadow .12s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: var(--brand);
+            background: #f0f7ff;
+            box-shadow: 0 12px 28px rgba(24,32,47,.10);
+        }
+        .card:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+        .card-number { font-size: 2rem; font-weight: 800; color: var(--brand); }
+        .card-title { font-size: .92rem; font-weight: 700; text-align: center; padding: 0 10px; }
+
+        @media (max-width: 820px) {
+            main { grid-template-columns: 1fr; }
+            .side { position: static; }
+            .top { flex-direction: column; align-items: start; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="top">
+            <div>
+                <h1>Teorema</h1>
+                <p class="subtitle">Menú principal</p>
+            </div>
+            <!-- También le agregué el "En proceso" al botón de configuraciones por si acaso -->
+            <button class="settings-btn" onclick="location.href='Configuraciones.html'">Configuraciones</button>        
+            </div>
+    </header>
+
+    <main>
+        <aside class="panel side">
+            <p class="section-title">Secciones</p>
+            <button class="nav-btn" data-section="modulos" aria-pressed="false">Módulos</button>
+            <button class="nav-btn" data-section="herramientas" aria-pressed="false">Herramientas</button>
+            <button class="nav-btn" data-section="sectionmep" aria-pressed="false">Educación Secundaria (MEP)</button>
+            <button class="nav-btn" data-section="sectionucr" aria-pressed="false">UCR UNA TEC</button>
+        </aside>
+
+        <section class="panel workspace">
+            <div class="empty" id="emptyState">
+                <div>
+                    <strong>Elige una sección para comenzar.</strong>
+                    <p>Selecciona Módulos o Herramientas en el menú de la izquierda.</p>
+                </div>
+            </div>
+
+            <div class="cards" id="section-modulos" hidden>
+                <div class="card" role="button" tabindex="0" onclick="location.href='Front0.html'">
+                    <span class="card-number">0</span>
+                    <span class="card-title">Matemática Básica</span>
+                </div>
+                <div class="card" role="button" tabindex="0" onclick="location.href='frontend1.html'">
+                    <span class="card-number">1</span>
+                    <span class="card-title">Principios de Álgebra</span>
+                </div>
+            </div>
+
+            <div class="cards" id="section-herramientas" hidden>
+                <div class="card" role="button" tabindex="0" onclick="location.href='Factorizadora_Front.html'">
+                    <span class="card-title">Calculadora de factorización</span>
+                </div>
+                <div class="card" role="button" tabindex="0" onclick="location.href='Graficadora_Front.html'">
+                    <span class="card-title">Calculadora graficadora</span>
+                </div>
+            </div>
+
+            <div class="cards" id="sectionmep" hidden>
+                <div class="card" role="button" tabindex="0" onclick="alert('En proceso...')">
+                    <span class="card-title">Séptimo año</span>
+                </div> 
+                
+                <div class="card" role="button" tabindex="0" onclick="alert('En proceso...')">
+                    <span class="card-title">Octavo año</span>
+                </div>
+
+                <div class="card" role="button" tabindex="0" onclick="alert('En proceso...')">
+                    <span class="card-title">Noveno año</span>
+                </div>
+
+                <div class="card" role="button" tabindex="0" onclick="alert('En proceso...')">
+                    <span class="card-title">Décimo año</span>
+                </div>
+
+                <div class="card" role="button" tabindex="0" onclick="alert('En proceso...')">
+                    <span class="card-title">Undécimo año</span>
+                </div>
+            </div> <!-- AQUI FALTABA ESTE CIERRE -->
+
+            <div class="cards" id="sectionucr" hidden>
+                <div class="card" role="button" tabindex="0" onclick="alert('En proceso...')">
+                    <span class="card-title">Lógica Matemática</span>
+                </div>
+            </div> <!-- AQUI FALTABA ESTE CIERRE -->
+
+        </section>
+    </main>
+
+    <script>
+        const navBtns = document.querySelectorAll('.nav-btn');
+        const emptyState = document.getElementById('emptyState');
+        const sections = {
+            modulos: document.getElementById('section-modulos'),
+            herramientas: document.getElementById('section-herramientas'),
+            sectionmep: document.getElementById('sectionmep'),
+            sectionucr: document.getElementById('sectionucr'),
+        };
+
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.dataset.section;
+
+                navBtns.forEach(b => {
+                    const isActive = b === btn;
+                    b.classList.toggle('active', isActive);
+                    b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
+                emptyState.hidden = true;
+
+                Object.entries(sections).forEach(([key, section]) => {
+                    section.hidden = key !== target;
+                });
+
+                const visible = sections[target];
+                visible.classList.remove('entering');
+                void visible.offsetWidth;
+                visible.classList.add('entering');
+            });
+        });
+
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    card.click();
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

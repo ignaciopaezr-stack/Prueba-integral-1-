@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Teorema – Configuraciones</title>
+    <style>
+        :root {
+            --ink: #18202f;
+            --muted: #667085;
+            --panel: #ffffff;
+            --soft: #f4f7fb;
+            --line: #d9e1ea;
+            --brand: #124b68;
+            --brand-2: #0b6b6f;
+            --accent: #c27a2c;
+            --good: #137a4b;
+            --bad: #b42318;
+        }
+        
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at top left,  #dfefff 0, transparent 35%),
+                radial-gradient(circle at top right, #e7fff7 0, transparent 30%),
+                linear-gradient(180deg, #eef5f7 0%, #f8fafc 42%, #fff 100%);
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0f172a, #124b68 55%, #0b6b6f);
+            color: white;
+            padding: 20px clamp(18px, 4vw, 56px);
+            border-bottom: 4px solid var(--accent);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, .18);
+        }
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            max-width: 1180px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+        h1 { margin: 0; font-size: clamp(20px, 2.6vw, 32px); font-weight: 800; }
+        .subtitle { margin: 6px 0 0; color: rgba(255,255,255,.8); font-size: 13px; }
+
+        .settings-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid rgba(255,255,255,.28);
+            background: rgba(255,255,255,.08);
+            color: #fff;
+            border-radius: 10px;
+            padding: 8px 14px;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .12s, background .12s;
+        }
+        .settings-btn:hover { transform: translateY(-1px); background: rgba(255,255,255,.18); }
+
+        main {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 18px clamp(14px, 3vw, 42px) 48px;
+            display: grid;
+            grid-template-columns: 270px minmax(0, 1fr);
+            gap: 16px;
+        }
+        .panel {
+            background: rgba(255,255,255,.9);
+            border: 1px solid rgba(217,225,234,.9);
+            box-shadow: 0 16px 40px rgba(24,32,47,.10);
+            border-radius: 16px;
+            backdrop-filter: blur(8px);
+        }
+
+        .side {
+            padding: 14px;
+            align-self: start;
+            position: sticky;
+            top: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .section-title {
+            margin: 0 0 8px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--muted);
+        }
+
+        button { font: inherit; }
+        .nav-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            border: 1px solid var(--line);
+            background: white;
+            color: var(--ink);
+            border-radius: 8px;
+            padding: 11px 14px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .12s, border-color .12s, background .12s, color .12s;
+        }
+        .nav-btn:hover { transform: translateY(-1px); border-color: var(--brand); background: #f0f7ff; color: var(--brand); }
+        .nav-btn.active { background: var(--brand); color: white; border-color: var(--brand); }
+
+        .workspace { padding: clamp(14px, 2.5vw, 24px); }
+
+        .empty {
+            min-height: 320px;
+            display: grid;
+            place-items: center;
+            color: var(--muted);
+            text-align: center;
+            border: 1px dashed var(--line);
+            border-radius: 10px;
+            background: #fff;
+            padding: 24px;
+        }
+        .empty strong { color: var(--ink); font-size: 15px; }
+        .empty p { margin: 6px 0 0; font-size: 13px; }
+
+        .settings-content { display: flex; flex-direction: column; gap: 24px; }
+        .settings-content[hidden] { display: none; }
+        .settings-content.entering { animation: fadeUp .2s ease both; }
+        
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .settings-header { border-bottom: 1px solid var(--line); padding-bottom: 16px; margin-bottom: 8px; }
+        .settings-header h2 { margin: 0 0 6px; font-size: 20px; font-weight: 800; color: var(--ink); }
+        .settings-header p { margin: 0; font-size: 14px; color: var(--muted); }
+
+        /* Componentes de formulario elegantes */
+        .form-group { display: flex; flex-direction: column; gap: 8px; max-width: 480px; }
+        .form-label { font-size: 13px; font-weight: 700; color: var(--ink); }
+        .form-input, .form-select {
+            padding: 10px 14px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            font: inherit;
+            font-size: 14px;
+            background: #fff;
+            color: var(--ink);
+            transition: all .15s ease;
+        }
+        .form-input:focus, .form-select:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(18, 75, 104, 0.1); }
+        
+        .form-row { display: flex; gap: 16px; flex-wrap: wrap; }
+        .form-row > * { flex: 1; min-width: 200px; }
+
+        /* Componente de lista de opciones (Toggles / Botones) */
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            gap: 16px;
+        }
+        .setting-info h3 { margin: 0 0 4px; font-size: 15px; font-weight: 700; color: var(--ink); }
+        .setting-info p { margin: 0; font-size: 13px; color: var(--muted); }
+
+        /* Toggle switch */
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--line); transition: .3s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        input:checked + .slider { background-color: var(--brand); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* Botones de acción */
+        .btn-primary { background: var(--brand); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: background .12s; align-self: flex-start; }
+        .btn-primary:hover { background: var(--brand-2); }
+        .btn-danger { background: #fff; color: var(--bad); border: 1px solid #fca5a5; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all .12s; }
+        .btn-danger:hover { background: #fef2f2; border-color: var(--bad); }
+
+        @media (max-width: 820px) {
+            main { grid-template-columns: 1fr; }
+            .side { position: static; }
+            .top { flex-direction: column; align-items: start; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="top">
+            <div>
+                <h1>Teorema</h1>
+                <p class="subtitle">Configuraciones</p>
+            </div>
+            <button class="settings-btn" onclick="location.href='Menu-Principal.html'">← Volver al Menú</button>
+        </div>
+    </header>
+
+    <main>
+        <aside class="panel side">
+            <p class="section-title">Ajustes</p>
+            <button class="nav-btn" data-section="perfil" aria-pressed="false">Perfil</button>
+            <button class="nav-btn" data-section="cuenta" aria-pressed="false">Cuenta</button>
+            <button class="nav-btn" data-section="privacidad" aria-pressed="false">Privacidad</button>
+            <button class="nav-btn" data-section="seguridad" aria-pressed="false">Seguridad</button>
+            <button class="nav-btn" data-section="idioma" aria-pressed="false">Idioma</button>
+            <button class="nav-btn" data-section="notificaciones" aria-pressed="false">Notificaciones</button>
+        </aside>
+
+        <section class="panel workspace">
+            <div class="empty" id="emptyState">
+                <div>
+                    <strong>Selecciona una opción de configuración</strong>
+                    <p>Elige una categoría en el menú de la izquierda para ver sus detalles.</p>
+                </div>
+            </div>
+
+            <div class="settings-content" id="section-perfil" hidden>
+                <div class="settings-header">
+                    <h2>Perfil Público</h2>
+                    <p>Administra la información que otros pueden ver sobre ti.</p>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Nombre(s)</label>
+                        <input type="text" class="form-input" placeholder="Tu nombre" value="Estudiante">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Apellidos</label>
+                        <input type="text" class="form-input" placeholder="Tus apellidos" value="Teorema">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Nombre de usuario</label>
+                    <input type="text" class="form-input" placeholder="@usuario" value="@estudianteteorema">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Biografía</label>
+                    <textarea class="form-input" rows="3" placeholder="Cuéntanos un poco sobre ti..."></textarea>
+                </div>
+
+                <button class="btn-primary" type="button">Guardar cambios</button>
+            </div>
+
+            <div class="settings-content" id="section-cuenta" hidden>
+                <div class="settings-header">
+                    <h2>Configuración de Cuenta</h2>
+                    <p>Gestiona tu información de acceso y plan actual.</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Correo electrónico asociado</label>
+                    <input type="email" class="form-input" placeholder="correo@ejemplo.com" value="usuario@teorema.edu">
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h3>Plan de Suscripción</h3>
+                        <p>Actualmente te encuentras en el plan Básico (Gratuito).</p>
+                    </div>
+                    <button class="btn-primary" type="button" style="background: var(--accent);">Mejorar plan</button>
+                </div>
+
+                <div class="setting-item" style="border-color: #fecaca; background: #fff5f5;">
+                    <div class="setting-info">
+                        <h3 style="color: var(--bad);">Eliminar cuenta</h3>
+                        <p>Una vez que elimines tu cuenta, no hay vuelta atrás.</p>
+                    </div>
+                    <button class="btn-danger" type="button">Eliminar cuenta</button>
+                </div>
+            </div>
+
+            <div class="settings-content" id="section-privacidad" hidden>
+                <div class="settings-header">
+                    <h2>Privacidad</h2>
+                    <p>Controla quién puede ver tu actividad en la plataforma.</p>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h3>Perfil visible públicamente</h3>
+                        <p>Permite que otros estudiantes y profesores encuentren tu perfil.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h3>Mostrar estado en línea</h3>
+                        <p>Los demás verán cuando estés usando la aplicación.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h3>Compartir progreso</h3>
+                        <p>Comparte tus logros en los módulos con tus profesores vinculados.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-content" id="section-seguridad" hidden>
+                <div class="settings-header">
+                    <h2>Seguridad y Acceso</h2>
+                    <p>Mantén tu cuenta de Teorema segura con estos ajustes.</p>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label class="form-label">Cambiar contraseña</label>
+                    <input type="password" class="form-input" placeholder="Contraseña actual" style="margin-bottom: 8px;">
+                    <input type="password" class="form-input" placeholder="Nueva contraseña">
+                    <button class="btn-primary" type="button" style="margin-top: 8px;">Actualizar contraseña</button>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h3>Autenticación en dos pasos (2FA)</h3>
+                        <p>Añade una capa extra de seguridad pidiendo un código temporal al iniciar sesión.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-content" id="section-idioma" hidden>
+                <div class="settings-header">
+                    <h2>Idioma y Región</h2>
+                    <p>Personaliza tu experiencia ajustando tu idioma preferido.</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Idioma de la interfaz</label>
+                    <select class="form-select">
+                        <option value="es">Español (Latinoamérica)</option>
+                        <option value="es-es">Español (España)</option>
+                        <option value="en">English (US)</option>
+                        <option value="pt">Português</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Formato de números y fechas</label>
+                    <select class="form-select">
+                        <option value="cr">Costa Rica (DD/MM/AAAA)</option>
+                        <option value="mx">México (DD/MM/AAAA)</option>
+                        <option value="us">Estados Unidos (MM/DD/AAAA)</option>
+                    </select>
+                </div>
+
+                <button class="btn-primary" type="button">Aplicar configuración</button>
+            </div>
+
+            <div class="settings-content" id="section-notificaciones" hidden>
+                <div class="settings-header">
+                    <h2>Notificaciones</h2>
+                    <p>Elige de qué quieres que te avisemos y cómo.</p>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h3>Resúmenes semanales</h3>
+                        <p>Recibe un correo cada semana con tu progreso en matemáticas.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h3>Alertas de nuevos módulos</h3>
+                        <p>Notificaciones sobre nuevo contenido en Educación Secundaria o UCR.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h3>Actualizaciones de Teorema</h3>
+                        <p>Información sobre nuevas herramientas, calculadoras y mejoras de la app.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <script>
+        const navBtns = document.querySelectorAll('.nav-btn');
+        const emptyState = document.getElementById('emptyState');
+        
+        // Mapeo de secciones según su ID
+        const sections = {
+            perfil: document.getElementById('section-perfil'),
+            cuenta: document.getElementById('section-cuenta'),
+            privacidad: document.getElementById('section-privacidad'),
+            seguridad: document.getElementById('section-seguridad'),
+            idioma: document.getElementById('section-idioma'),
+            notificaciones: document.getElementById('section-notificaciones'),
+        };
+
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.dataset.section;
+
+                // Actualizar estado activo en los botones
+                navBtns.forEach(b => {
+                    const isActive = b === btn;
+                    b.classList.toggle('active', isActive);
+                    b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
+                
+                // Ocultar estado vacío
+                emptyState.hidden = true;
+
+                // Ocultar todas las secciones y mostrar solo la seleccionada
+                Object.entries(sections).forEach(([key, section]) => {
+                    section.hidden = key !== target;
+                });
+
+                // Reiniciar la animación de entrada
+                const visible = sections[target];
+                visible.classList.remove('entering');
+                void visible.offsetWidth; // Forzar reflow para reiniciar animación
+                visible.classList.add('entering');
+            });
+        });
+    </script>
+
+</body>
+</html>

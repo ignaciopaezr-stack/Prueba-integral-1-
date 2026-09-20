@@ -1,0 +1,12 @@
+# Ocultar claves de seguridad
+.env
+
+# Ignorar archivos basura de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignorar carpetas de entornos virtuales (por si haces uno luego)
+venv/
+env/

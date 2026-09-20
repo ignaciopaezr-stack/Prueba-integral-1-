@@ -1,0 +1,2431 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calculadora Graficadora · Teorema</title>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [["\\(", "\\)"], ["$", "$"]], displayMath: [["\\[", "\\]"]] },
+      svg: { fontCache: "global" },
+      startup: { typeset: false }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+
+  <style>
+    /* =====================================================================
+    TEOREMA · Calculadora Graficadora — style.css
+    ===================================================================== */
+
+    :root {
+      /* — Tokens heredados de frontend1.html — */
+      --ink: #18202f;
+      --muted: #667085;
+      --panel: #ffffff;
+      --soft: #f4f7fb;
+      --line: #d9e1ea;
+      --brand: #124b68;
+      --brand-2: #0b6b6f;
+      --accent: #c27a2c;
+      --good: #137a4b;
+      --bad: #b42318;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+
+      /* — Paleta para funciones simultáneas f1(x), f2(x)... — */
+      --fn-0: var(--brand);
+      --fn-1: var(--accent);
+      --fn-2: var(--good);
+      --fn-3: #7c3aed;
+      --fn-4: #be185d;
+      --fn-5: var(--brand-2);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left,  #dfefff 0, transparent 35%),
+        radial-gradient(circle at top right, #e7fff7 0, transparent 30%),
+        linear-gradient(180deg, #eef5f7 0%, #f8fafc 42%, #fff 100%);
+      background-attachment: fixed; 
+      background-repeat: no-repeat; 
+      min-height: 100vh;
+      transition: background-color .2s ease, color .2s ease;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+    }
+
+    button, select, input, textarea { font: inherit; }
+    :focus-visible { outline: 3px solid rgba(18,75,104,.35); outline-offset: 1px; }
+
+    /* ── BARRA SUPERIOR ─────────────────────────────────────────────────── */
+    .topbar {
+      background: linear-gradient(135deg, #0f172a, #124b68 55%, #0b6b6f);
+      color: #fff;
+      padding: 14px clamp(14px, 4vw, 40px);
+      border-bottom: 4px solid var(--accent);
+      box-shadow: 0 10px 30px rgba(15,23,42,.18);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .topbar-titles { min-width: 0; }
+    .topbar-titles h1 { margin: 0; font-size: clamp(17px, 2.2vw, 22px); font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .topbar-titles .subtitle { margin: 2px 0 0; color: rgba(255,255,255,.78); font-size: 12px; }
+    .topbar-right { display: flex; align-items: center; gap: 8px; }
+
+    .icon-btn {
+      width: 36px; height: 36px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.28);
+      background: rgba(255,255,255,.08);
+      color: #fff;
+      cursor: pointer;
+      transition: transform .12s, background .12s, border-color .12s;
+      flex: none;
+    }
+    .icon-btn:hover { transform: translateY(-1px); background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.5); }
+    .icon-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; }
+
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid rgba(255,255,255,.28);
+      background: rgba(255,255,255,.08);
+      color: #fff;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 13px; font-weight: 700;
+      cursor: pointer;
+      transition: transform .12s, background .12s;
+      text-decoration: none;
+      flex: none;
+    }
+    .back-btn:hover { transform: translateY(-1px); background: rgba(255,255,255,.18); }
+
+    /* ── LAYOUT PRINCIPAL ───────────────────────────────────────────────── */
+    main.app {
+      max-width: 1420px;
+      margin: 0 auto;
+      padding: 16px clamp(12px, 3vw, 32px) 40px;
+      display: grid;
+      grid-template-columns: 264px minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(255,255,255,.9);
+      border: 1px solid rgba(217,225,234,.9);
+      box-shadow: 0 16px 40px rgba(24,32,47,.10);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(8px);
+    }
+
+    .section-title {
+      margin: 0 0 8px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 26px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: default;
+    }
+    .pill.pill-live { color: var(--brand); border-color: var(--brand); background: #eaf3fb; }
+
+    /* ── BOTONES BASE (heredado) ────────────────────────────────────────── */
+    button {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      border-radius: var(--radius-sm);
+      padding: 9px 11px;
+      cursor: pointer;
+      transition: transform .12s, border-color .12s, background .12s, color .12s;
+    }
+    button:hover { transform: translateY(-1px); border-color: var(--brand); background: #f0f7ff; color: var(--brand); }
+    button:active { transform: translateY(0) scale(.97); }
+    button:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+    button.primary { background: var(--brand); color: #fff; border-color: var(--brand); font-weight: 800; }
+    button.accent  { background: #fff7ed; color: #8a4b10; border-color: #f4c38a; font-weight: 800; }
+    button.good    { background: #ecfdf3; color: var(--good); border-color: #abd9bf; font-weight: 800; }
+    button.danger  { background: #fff1f0; color: var(--bad); border-color: #f4b8b2; font-weight: 800; }
+
+   /* ── PANEL IZQUIERDO: CALCULADORA CIENTÍFICA ────────────────────────── */
+    .calc-panel { 
+      padding: 14px; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 12px; 
+    }
+
+    .calc-status-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+    
+    .mode-toggle { display: flex; gap: 4px; background: var(--soft); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+    .mode-toggle button { border: none; background: transparent; padding: 4px 9px; border-radius: 999px; font-size: 10.5px; font-weight: 800; color: var(--muted); }
+    .mode-toggle button:hover { transform: none; background: rgba(18,75,104,.08); color: var(--brand); }
+    .mode-toggle button.active { background: var(--brand); color: #fff; }
+
+    .preview-container { display: flex; flex-direction: column; gap: 4px; }
+    .preview-label { margin: 0 0 0 2px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+    
+    #livePreview {
+      min-height: 58px;
+      width: 100%;
+      color: var(--brand);
+      font-weight: 700;
+      border: 1.5px dashed var(--brand);
+      border-radius: var(--radius-md);
+      background: var(--soft);
+      padding: 12px 14px;
+      text-align: left;
+      font-size: 19px;
+      overflow-x: auto;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 4px 14px rgba(18,75,104,.06);
+    }
+    #livePreview.has-error { color: var(--bad); font-size: 12px; font-weight: 600; border-color: var(--bad); }
+    #livePreview:empty::before { content: "Así se va a ver tu función..."; color: var(--muted); font-size: 12px; font-weight: 500; }
+
+    .calc-input-wrap { width: 100%; position: relative; }
+    #calcInput {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      background: var(--panel);
+      color: var(--ink);
+      font-size: 16px;
+      font-weight: 600;
+      text-align: left;
+      outline: none;
+      caret-color: var(--brand);
+    }
+    #calcInput:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(18,75,104,.15); }
+
+    .keypad-groups { display: grid; gap: 7px; }
+    .keypad-group { border: 1px solid var(--line); border-radius: var(--radius-md); background: #fbfdff; padding: 6px 7px; }
+    .keypad-group .section-title { margin: 1px 2px 5px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
+    .keypad-group .section-title .chev { transition: transform .15s ease; opacity: .6; font-size: 9px; }
+    .keypad-group.collapsed .section-title .chev { transform: rotate(-90deg); }
+    .keypad-group.collapsed .keypad-grid { display: none; }
+    .keypad-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+    .keypad-grid.cols-5 { grid-template-columns: repeat(5, 1fr); }
+    .keypad-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .keypad-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .keypad-row-compact { display: flex; gap: 7px; }
+    .keypad-row-compact .keypad-group { flex: 1; }
+
+    .key {
+      min-height: 28px;
+      padding: 4px 3px;
+      font-size: 12px;
+      font-weight: 800;
+      border-radius: var(--radius-sm);
+    }
+    .key.key-num { background: var(--panel); }
+    .key.key-op { background: #eef6ff; color: var(--brand); border-color: #bcd8ee; }
+    .key.key-fn { background: var(--soft); color: var(--ink); font-size: 11px; }
+    .key.key-const { background: #fff7ed; color: #8a4b10; border-color: #f4c38a; }
+    .key.key-var { background: #eaf3fb; color: var(--brand); border-color: #bcd8ee; font-weight: 800; }
+    .key.key-mem { background: #f3f0ff; color: #5b21b6; border-color: #d7ccfa; font-size: 11.5px; }
+    .key.key-clear { background: #fff1f0; color: var(--bad); border-color: #f4b8b2; }
+    .key.key-equals { background: var(--brand); color: #fff; border-color: var(--brand); font-size: 18px; grid-column: span 2; }
+    .key.key-equals:hover { background: var(--brand-2); }
+
+    .result-box { border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 4px; }
+    .result-box .result-decimal { font-size: 20px; font-weight: 800; color: var(--ink); word-break: break-all; }
+    .result-box .result-exact { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+    .result-box.result-error .result-decimal { color: var(--bad); font-size: 14px; font-weight: 700; }
+
+    /* ── PANEL DERECHO: GRÁFICA ──────────────────────────────────────────── */
+    .graph-col { display: grid; gap: 16px; min-width: 0; }
+    .graph-panel { padding: 14px; display: grid; gap: 10px; min-width: 0; }
+    .graph-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .graph-toolbar-controls { display: flex; gap: 6px; flex-wrap: wrap; }
+    .graph-toolbar-controls button { padding: 7px 10px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
+    .graph-toolbar-controls button.is-active { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .graph-toolbar-controls button svg { width: 14px; height: 14px; stroke: currentColor; fill: none; }
+
+    #plotArea { width: 100%; height: min(62vh, 620px); min-height: 340px; border-radius: var(--radius-md); overflow: hidden; background: #fff; transition: opacity .15s ease; }
+    #plotArea.is-loading { opacity: .45; cursor: progress; }
+
+    .graph-empty {
+      min-height: 340px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      text-align: center;
+      border: 1px dashed var(--line);
+      border-radius: var(--radius-md);
+      background: var(--soft);
+      padding: 24px;
+    }
+
+    /* ── PESTAÑAS: FUNCIONES / HISTORIAL ────────────────────────────────── */
+    .tabs-panel { padding: 0; overflow: hidden; }
+    .tabs-head { display: flex; border-bottom: 1px solid var(--line); }
+    .tab-btn {
+      flex: 1;
+      border: none; border-radius: 0;
+      background: transparent;
+      padding: 12px 10px;
+      font-size: 13px; font-weight: 800;
+      color: var(--muted);
+    }
+    .tab-btn:hover { transform: none; background: var(--soft); color: var(--brand); }
+    .tab-btn.active { color: var(--brand); box-shadow: inset 0 -3px 0 var(--brand); }
+    .tab-body { padding: 12px 14px; max-height: 320px; overflow-y: auto; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: grid; gap: 8px; }
+
+    .fn-item, .hist-item {
+      display: flex; align-items: center; gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      background: var(--panel);
+    }
+    .fn-swatch { width: 12px; height: 12px; border-radius: 999px; flex: none; }
+    .fn-expr, .hist-main { flex: 1; min-width: 0; font-size: 13px; font-weight: 700; overflow-x: auto; white-space: nowrap; }
+    .hist-main .hist-latex { display: block; }
+    .hist-meta { font-size: 10.5px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+    .fn-actions, .hist-actions { display: flex; gap: 4px; flex: none; }
+    .fn-actions button, .hist-actions button { width: 28px; height: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+    .fn-actions button svg, .hist-actions button svg { width: 14px; height: 14px; stroke: currentColor; fill: none; }
+    .fn-item.is-hidden { opacity: .5; }
+
+    .add-fn-row { display: flex; gap: 6px; padding: 4px 14px 12px; }
+    .add-fn-row input {
+      flex: 1;
+      border: 1px solid var(--line); border-radius: var(--radius-sm);
+      padding: 8px 10px; font-size: 13px; background: var(--panel); color: var(--ink);
+    }
+    .add-fn-row input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(18,75,104,.15); }
+
+    .range-input-row { display: flex; align-items: center; gap: 6px; }
+    .range-input-row .range-prefix { font-weight: 700; color: var(--muted); }
+    .range-input-row input {
+      width: 90px;
+      border: 1px solid var(--line); border-radius: var(--radius-sm);
+      padding: 8px 10px; font-size: 13px; background: var(--panel); color: var(--ink);
+    }
+    .range-input-row input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(18,75,104,.15); }
+
+    .empty-note { color: var(--muted); font-size: 12.5px; text-align: center; padding: 14px 8px; }
+
+    /* ── TOASTS / ERRORES ELEGANTES ─────────────────────────────────────── */
+    #toastStack { position: fixed; right: 16px; bottom: 16px; display: grid; gap: 8px; z-index: 60; max-width: min(360px, calc(100vw - 32px)); }
+    .toast {
+      background: var(--ink); color: #fff;
+      border-radius: var(--radius-sm);
+      padding: 11px 14px;
+      font-size: 13px; font-weight: 600;
+      box-shadow: 0 12px 28px rgba(24,32,47,.25);
+      animation: toast-in .18s ease;
+    }
+    .toast.toast-error { background: #fff1f0; color: var(--bad); border: 1px solid #f4b8b2; }
+    .toast.toast-ok { background: #ecfdf3; color: var(--good); border: 1px solid #abd9bf; }
+    @keyframes toast-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── MODALES (Ajustes / Ayuda) ──────────────────────────────────────── */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(15,23,42,.45);
+      display: none; align-items: center; justify-content: center; padding: 20px; z-index: 70;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--panel); border-radius: var(--radius-lg);
+      border: 1px solid var(--line);
+      box-shadow: 0 20px 50px rgba(24,32,47,.25);
+      max-width: 420px; width: 100%; max-height: 80vh; overflow-y: auto;
+      padding: 20px;
+      animation: modal-in .16s ease;
+    }
+    @keyframes modal-in { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .modal h2 { margin: 0 0 4px; font-size: 17px; }
+    .modal p.hint { margin: 0 0 16px; color: var(--muted); font-size: 12.5px; }
+    .modal-row { display: grid; gap: 6px; margin-bottom: 14px; }
+    .modal-row label { font-size: 12px; font-weight: 700; color: var(--muted); }
+    .modal-close-row { display: flex; justify-content: flex-end; margin-top: 6px; }
+    .help-list { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.7; color: var(--ink); }
+
+    /* ── LOADING ─────────────────────────────────────────────────────────── */
+    .spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(18,75,104,.25); border-top-color: var(--brand); animation: spin .7s linear infinite; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── RESPONSIVE ──────────────────────────────────────────────────────── */
+    @media (max-width: 980px) {
+      main.app { grid-template-columns: 1fr; }
+      .calc-panel { order: 2; }
+      .graph-col { order: 1; }
+      #plotArea { height: 52vh; }
+    }
+    @media (max-width: 480px) {
+      .keypad-grid { grid-template-columns: repeat(4, 1fr); }
+      .topbar-titles .subtitle { display: none; }
+    }
+
+    /* ── OCULTAR BOTÓN IGUAL Y CAJA DE RESULTADOS ── */
+    #equalsBtn, 
+    #resultBox {
+      display: none !important;
+    }
+
+    .btn-volver {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    color: #124b68;
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px; /* Padding igualado para que el botón se vea cuadradito */
+    background-color: #ffffff;
+    border: 1px solid #d9e1ea;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(24, 32, 47, 0.08);
+    transition: all 0.3s ease; /* Transición suave */
+    overflow: hidden; /* Oculta lo que sobresale */
+    }
+
+    .btn-volver:hover {
+        background-color: #f0f7ff;
+        border-color: #124b68;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(18, 75, 104, 0.15);
+        padding: 10px 16px; /* Al expandirse, recupera el padding horizontal */
+    }
+
+    /* Estado inicial del texto: Oculto y sin ancho */
+    .btn-texto {
+        max-width: 0;
+        opacity: 0;
+        margin-left: 0;
+        white-space: nowrap; /* Evita que el texto salte de línea al animarse */
+        transition: all 0.3s ease; /* Misma duración que el hover del botón */
+    }
+
+    /* Estado al hacer hover: Aparece el texto y se separa del ícono */
+    .btn-volver:hover .btn-texto {
+        max-width: 150px; /* Espacio suficiente para "Volver al Menú" */
+        opacity: 1;
+        margin-left: 8px; /* Esto reemplaza el antiguo 'gap' */
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      
+        <a href="Menu-Principal.html" class="btn-volver">
+            <!-- Ícono de flecha SVG -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span class="btn-texto">Volver al Menú</span>
+        </a>
+
+      <div class="topbar-titles">
+        <h1>Calculadora Graficadora</h1>
+        <p class="subtitle">Módulo de Teorema · escribe una función y se grafica sola</p>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button type="button" class="icon-btn" id="settingsBtn" aria-label="Ajustes">
+        <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>
+      </button>
+      <button type="button" class="icon-btn" id="helpBtn" aria-label="Ayuda">
+        <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2-3 4"/><path d="M12 17h.01"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="app">
+    <!-- ══ PANEL IZQUIERDO: CALCULADORA CIENTÍFICA ══ -->
+    <section class="panel calc-panel" aria-label="Calculadora científica">
+      
+      <!-- Fila superior de estados -->
+      <div class="calc-status-row">
+        <span class="pill">Calculadora</span>
+        <div class="mode-toggle" id="modeToggle">
+          <button type="button" data-mode="DEG">DEG</button>
+          <button type="button" data-mode="RAD" class="active">RAD</button>
+          <button type="button" data-mode="GRAD">GRAD</button>
+        </div>
+      </div>
+
+      <!-- 1. Cuadro de LATEX bonito (Arriba) -->
+      <div class="preview-container">
+        <p class="preview-label">Vista previa matemática</p>
+        <div id="livePreview" aria-live="polite"></div>
+      </div>
+
+      <!-- 2. Cuadro para Escribir (En medio) -->
+      <div class="calc-input-wrap">
+        <input type="text" id="calcInput" inputmode="text" autocomplete="off" spellcheck="false" placeholder="Escribe aquí tu función...">
+      </div>
+
+      <!-- 3. Teclas con botones especiales (Abajo) -->
+      <div class="keypad-groups" id="keypadGroups"></div>
+
+      <button type="button" class="key key-equals" id="equalsBtn" style="width:100%">=</button>
+
+      <div class="result-box" id="resultBox"></div>
+    </section>
+
+    <!-- ══ PANEL DERECHO: GRÁFICA + FUNCIONES + HISTORIAL ══ -->
+    <section class="graph-col">
+      <div class="panel graph-panel" aria-label="Gráfica">
+        <div class="graph-toolbar">
+          <div class="graph-toolbar-controls">
+            <span class="pill pill-live">Modo <span id="dimPill">—</span></span>
+            <div class="mode-toggle" id="graphModeToggle" title="Elegir 2D/3D a mano, o dejar que se detecte solo">
+              <button type="button" data-graphmode="auto" class="active">Auto</button>
+              <button type="button" data-graphmode="2d">2D</button>
+              <button type="button" data-graphmode="3d">3D</button>
+            </div>
+          </div>
+          <div class="graph-toolbar-controls">
+            <button type="button" id="toggleGrid" title="Mostrar/ocultar cuadrícula">Cuadrícula</button>
+            <button type="button" id="toggleAxes" title="Mostrar/ocultar ejes">Ejes</button>
+            <button type="button" id="toggleLegend" title="Mostrar/ocultar leyenda">Leyenda</button>
+            <button type="button" id="zoomOutBtn" title="Alejar zoom">− Zoom</button>
+            <button type="button" id="zoomInBtn" title="Acercar zoom">+ Zoom</button>
+            <button type="button" id="resetView" title="Restablecer vista">Restablecer</button>
+            <button type="button" id="downloadImg" title="Descargar imagen">⭳ Imagen</button>
+          </div>
+          <div class="graph-toolbar-controls">
+            <button type="button" id="toggleInterseccionVol" title="Muestra únicamente el área/volumen que las figuras 3D implícitas tienen en común, ocultando el resto">Intersección</button>
+          </div>
+        </div>
+        <div id="plotArea"></div>
+        <div id="graphEmpty" class="graph-empty">
+          <div><strong>Escribe una función y agrégala para verla aquí.</strong></div>
+        </div>
+      </div>
+
+      <div class="panel tabs-panel" id="sidePanels">
+        <div class="tabs-head">
+          <button type="button" class="tab-btn active" data-tab="functionsTab">Funciones</button>
+          <button type="button" class="tab-btn" data-tab="historyTab">Historial</button>
+        </div>
+        <div class="tab-body">
+          <div id="functionsTab" class="tab-panel active">
+            <div id="functionList"></div>
+          </div>
+          <div id="historyTab" class="tab-panel">
+            <div id="historyList"></div>
+          </div>
+        </div>
+        <div class="add-fn-row">
+          <input type="text" id="newFunctionInput" placeholder="Ej: sin(x), x**2+y**2, x**2+y**2+z**2=25">
+          <button type="button" class="primary" id="addFunctionBtn">Agregar</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toastStack"></div>
+
+  <!-- ══ MODAL: AJUSTES ══ -->
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal" role="dialog" aria-labelledby="settingsTitle">
+      <h2 id="settingsTitle">Ajustes</h2>
+      <p class="hint">Estos ajustes son de esta calculadora.</p>
+      <div class="modal-row">
+        <label>Modo angular</label>
+        <div class="mode-toggle" id="modeToggleSettings" style="width:fit-content">
+          <button type="button" data-mode="DEG">DEG</button>
+          <button type="button" data-mode="RAD" class="active">RAD</button>
+          <button type="button" data-mode="GRAD">GRAD</button>
+        </div>
+      </div>
+      <div class="modal-row">
+        <label for="rangeInput">Rango de gráficas 3D (esferas, planos, z=f(x,y), etc.)</label>
+        <div class="range-input-row">
+          <span class="range-prefix">±</span>
+          <input type="number" id="rangeInput" min="0.5" max="50" step="0.5" value="8" inputmode="decimal">
+        </div>
+        <p class="hint" style="margin:4px 0 0">Cualquier valor entre 0.5 y 50. Si tu superficie no aparece o se ve cortada, probá un número más grande.</p>
+      </div>
+      <div class="modal-row">
+        <label>URL del backend</label>
+        <p class="hint" style="margin:0" id="backendUrlDisplay"></p>
+      </div>
+      <div class="modal-close-row"><button type="button" class="primary" data-close-modal="settingsModal">Cerrar</button></div>
+    </div>
+  </div>
+
+  <!-- ══ MODAL: AYUDA ══ -->
+  <div class="modal-backdrop" id="helpModal">
+    <div class="modal" role="dialog" aria-labelledby="helpTitle">
+      <h2 id="helpTitle">Ayuda rápida</h2>
+      <ul class="help-list">
+        <li>Escribe con el teclado o directamente en la pantalla — la vista previa de arriba muestra la notación matemática mientras escribes.</li>
+        <li>Usa <strong>x</strong> para funciones normales, agrega <strong>y</strong> para superficies 3D tipo z=f(x,y), y agrega <strong>z</strong> (o escribe una ecuación con "=") para cualquier superficie 3D — esferas, elipsoides, toros, planos, lo que sea. Ejemplo: <code>x^2+y^2+z^2=25</code> para una esfera de radio 5.</li>
+        <li>Si tu superficie 3D se ve cortada o no aparece, agrandá el rango en Ajustes.</li>
+        <li>Arriba de la gráfica hay un selector <strong>Auto / 2D / 3D</strong> — normalmente "Auto" alcanza, pero si querés forzar un modo a mano, podés.</li>
+        <li>En 2D podés mover y hacer zoom libremente — se recalcula al instante (sin esperar al servidor) para lo que estés mirando, no se corta en ±10. "Restablecer" te devuelve a la vista inicial.</li>
+        <li>El botón <strong>"="</strong> grande evalúa un solo valor; la tecla <strong>=</strong> del teclado escribe el símbolo dentro de una ecuación. Para graficar, agrega la función/ecuación con "Agregar" en la pestaña Funciones.</li>
+        <li>Puedes tener varias funciones a la vez, cada una con su color — ocúltalas, edítalas o bórralas desde la lista. Las superficies 3D explícitas e implícitas se pueden combinar en la misma gráfica.</li>
+        <li>El historial guarda tus cálculos con "=" para reutilizarlos o editarlos después.</li>
+      </ul>
+      <div class="modal-close-row"><button type="button" class="primary" data-close-modal="helpModal">Entendido</button></div>
+    </div>
+  </div>
+
+  <script>
+    (function (root, factory) {
+    if (typeof module === "object" && module.exports) {
+        module.exports = factory();
+    } else {
+        root.TeoremaMath = factory();
+    }
+    })(typeof self !== "undefined" ? self : this, function () {
+    "use strict";
+
+    class MathError extends Error {}
+
+    function bigAbs(n) { return n < 0n ? -n : n; }
+    function bigGcd(a, b) {
+        a = bigAbs(a); b = bigAbs(b);
+        while (b) { const t = a % b; a = b; b = t; }
+        return a === 0n ? 1n : a;
+    }
+
+    class Frac {
+        constructor(num, den) {
+        if (den === undefined) den = 1n;
+        if (den === 0n) throw new MathError("División entre cero.");
+        if (den < 0n) { num = -num; den = -den; }
+        const g = bigGcd(num, den);
+        this.n = num / g;
+        this.d = den / g;
+        }
+        static fromInt(i) { return new Frac(BigInt(i), 1n); }
+        add(o) { return new Frac(this.n * o.d + o.n * this.d, this.d * o.d); }
+        sub(o) { return new Frac(this.n * o.d - o.n * this.d, this.d * o.d); }
+        mul(o) { return new Frac(this.n * o.n, this.d * o.d); }
+        div(o) { if (o.n === 0n) throw new MathError("División entre cero."); return new Frac(this.n * o.d, this.d * o.n); }
+        neg() { return new Frac(-this.n, this.d); }
+        isInt() { return this.d === 1n; }
+        isZero() { return this.n === 0n; }
+        isNeg() { return this.n < 0n; }
+        toNumber() { return Number(this.n) / Number(this.d); }
+        toString() { return this.isInt() ? this.n.toString() : `${this.n}/${this.d}`; }
+    }
+
+    function bigIntSqrt(n) {
+        if (n < 0n) return null;
+        if (n < 2n) return n;
+        let x0 = n, x1 = (x0 + 1n) / 2n;
+        while (x1 < x0) { x0 = x1; x1 = (x0 + n / x0) / 2n; }
+        return x0 * x0 === n ? x0 : null;
+    }
+    function fracSqrt(f) {
+        if (f.n < 0n) return null;
+        const sn = bigIntSqrt(f.n), sd = bigIntSqrt(f.d);
+        if (sn !== null && sd !== null) return new Frac(sn, sd);
+        return null;
+    }
+    function bigFactorial(n) {
+        if (n < 0n) throw new MathError("El factorial no está definido para negativos.");
+        let r = 1n;
+        for (let i = 2n; i <= n; i++) r *= i;
+        return r;
+    }
+
+    function V_exact(frac) { return { exact: true, frac, value: frac.toNumber() }; }
+    function V_float(value) { return { exact: false, frac: null, value }; }
+    function toFloatValue(v) { return v.exact ? v.frac.toNumber() : v.value; }
+
+    const FN1 = ["asin", "acos", "atan", "sinh", "cosh", "tanh", "sin", "cos", "tan",
+                "log", "ln", "exp", "sqrt", "cbrt", "abs"];
+    const FN2 = ["root", "mod", "gcd", "lcm", "ncr", "npr"];
+    const VARIABLES = new Set(["x", "y", "z"]);
+    const CONSTANTS = new Set(["pi", "e"]);
+    const FN_ALL = [...FN1, ...FN2, ...CONSTANTS].sort((a, b) => b.length - a.length);
+
+    function tokenize(input) {
+        const s = String(input || "");
+        const tokens = [];
+        let i = 0;
+        const n = s.length;
+        while (i < n) {
+        const c = s[i];
+        if (c === " " || c === "\t" || c === "\n") { i++; continue; }
+        if (c === "π") { tokens.push({ t: "CONST", v: "pi" }); i++; continue; }
+        if (/[0-9]/.test(c) || (c === "." && /[0-9]/.test(s[i + 1] || ""))) {
+            let j = i;
+            while (j < n && /[0-9]/.test(s[j])) j++;
+            if (s[j] === ".") { j++; while (j < n && /[0-9]/.test(s[j])) j++; }
+            tokens.push({ t: "NUM", v: s.slice(i, j) });
+            i = j;
+            continue;
+        }
+        if (/[A-Za-z]/.test(c)) {
+            const rest = s.slice(i).toLowerCase();
+            const kw = FN_ALL.find(k => rest.startsWith(k));
+            if (kw) {
+            if (CONSTANTS.has(kw)) { tokens.push({ t: "CONST", v: kw }); i += kw.length; continue; }
+            tokens.push({ t: "FUNC", v: kw });
+            i += kw.length;
+            continue;
+            }
+            if (VARIABLES.has(c.toLowerCase())) { tokens.push({ t: "VAR", v: c.toLowerCase() }); i++; continue; }
+            throw new MathError(`No reconozco "${c}" en la expresión.`);
+        }
+        if (c === "*" && s[i + 1] === "*") { tokens.push({ t: "CARET" }); i += 2; continue; }
+        if (c === "^") { tokens.push({ t: "CARET" }); i++; continue; }
+        if (c === "+") { tokens.push({ t: "PLUS" }); i++; continue; }
+        if (c === "-" || c === "−") { tokens.push({ t: "MINUS" }); i++; continue; }
+        if (c === "*" || c === "·" || c === "×") { tokens.push({ t: "STAR" }); i++; continue; }
+        if (c === "/" || c === "÷") { tokens.push({ t: "SLASH" }); i++; continue; }
+        if (c === "(") { tokens.push({ t: "LP" }); i++; continue; }
+        if (c === ")") { tokens.push({ t: "RP" }); i++; continue; }
+        if (c === ",") { tokens.push({ t: "COMMA" }); i++; continue; }
+        if (c === "!") { tokens.push({ t: "BANG" }); i++; continue; }
+        if (c === "%") { tokens.push({ t: "PCT" }); i++; continue; }
+        if (c === "=") { tokens.push({ t: "EQ" }); i++; continue; }
+        if (c === "|") throw new MathError('Usa "abs(...)" para valor absoluto en vez de "|...|".');
+        throw new MathError(`No reconozco el símbolo "${c}".`);
+        }
+        tokens.push({ t: "EOF" });
+        return tokens;
+    }
+
+    function parse(input) {
+        const tokens = tokenize(input);
+        let pos = 0;
+        const peek = () => tokens[pos];
+        const next = () => tokens[pos++];
+        const expect = (t, msg) => { if (peek().t !== t) throw new MathError(msg || `Se esperaba "${t}".`); return next(); };
+
+        function canStartUnary(tok) {
+        return tok.t === "NUM" || tok.t === "VAR" || tok.t === "CONST" ||
+                tok.t === "LP" || tok.t === "FUNC" ||
+                tok.t === "MINUS" || tok.t === "PLUS";
+        }
+
+        function parseExpr() {
+        let node = parseTerm();
+        while (peek().t === "PLUS" || peek().t === "MINUS") {
+            const op = next().t === "PLUS" ? "+" : "-";
+            node = { type: "bin", op, l: node, r: parseTerm() };
+        }
+        return node;
+        }
+        function parseTerm() {
+        let node = parseUnary();
+        for (;;) {
+            if (peek().t === "STAR") { next(); node = { type: "bin", op: "*", l: node, r: parseUnary() }; continue; }
+            if (peek().t === "SLASH") { next(); node = { type: "bin", op: "/", l: node, r: parseUnary() }; continue; }
+            if (canStartUnary(peek()) && peek().t !== "MINUS" && peek().t !== "PLUS") {
+            node = { type: "bin", op: "*", implicit: true, l: node, r: parseUnary() };
+            continue;
+            }
+            break;
+        }
+        return node;
+        }
+        function parseUnary() {
+        if (peek().t === "MINUS") { next(); return { type: "neg", a: parseUnary() }; }
+        if (peek().t === "PLUS") { next(); return parseUnary(); }
+        return parsePower();
+        }
+        function parsePower() {
+        const base = parsePostfix();
+        if (peek().t === "CARET") { next(); return { type: "bin", op: "^", l: base, r: parseUnary() }; }
+        return base;
+        }
+        function parsePostfix() {
+        let node = parseAtom();
+        for (;;) {
+            if (peek().t === "BANG") { next(); node = { type: "fact", a: node }; continue; }
+            if (peek().t === "PCT") { next(); node = { type: "pct", a: node }; continue; }
+            break;
+        }
+        return node;
+        }
+        function parseAtom() {
+        const tok = peek();
+        if (tok.t === "NUM") { next(); return { type: "num", v: tok.v }; }
+        if (tok.t === "CONST") { next(); return { type: "const", v: tok.v }; }
+        if (tok.t === "VAR") { next(); return { type: "var", v: tok.v }; }
+        if (tok.t === "LP") {
+            next();
+            const inner = parseExpr();
+            expect("RP", 'Falta un ")".');
+            return inner;
+        }
+        if (tok.t === "FUNC") {
+            next();
+            expect("LP", `Se esperaba "(" después de "${tok.v}".`);
+            const args = [parseExpr()];
+            while (peek().t === "COMMA") { next(); args.push(parseExpr()); }
+            expect("RP", `Falta un ")" para cerrar "${tok.v}(".`);
+            const maxArgs = FN2.includes(tok.v) ? 2 : 1;
+            if (args.length > maxArgs) throw new MathError(`"${tok.v}" no acepta tantos argumentos.`);
+            return { type: "func", name: tok.v, args };
+        }
+        throw new MathError("Expresión incompleta.");
+        }
+
+        if (peek().t === "EOF") throw new MathError("Escribe una expresión.");
+        const lhs = parseExpr();
+        if (peek().t === "EQ") {
+        next();
+        const rhs = parseExpr();
+        expect("EOF", "Sobra algo al final de la ecuación.");
+        return { type: "eq", l: lhs, r: rhs };
+        }
+        expect("EOF", "Sobra algo al final de la expresión.");
+        return lhs;
+    }
+
+    function collectVars(node, set) {
+        if (!node) return set;
+        if (node.type === "var") set.add(node.v);
+        if (node.type === "eq") { collectVars(node.l, set); collectVars(node.r, set); }
+        if (node.type === "bin") { collectVars(node.l, set); collectVars(node.r, set); }
+        if (node.type === "neg" || node.type === "fact" || node.type === "pct") collectVars(node.a, set);
+        if (node.type === "func") node.args.forEach(a => collectVars(a, set));
+        return set;
+    }
+    function getVariables(input) {
+        try {
+        const ast = parse(input);
+        return Array.from(collectVars(ast, new Set())).sort();
+        } catch (e) {
+        return [];
+        }
+    }
+
+    const DEG = "DEG", RAD = "RAD", GRAD = "GRAD";
+    function toRad(x, mode) {
+        if (mode === DEG) return x * Math.PI / 180;
+        if (mode === GRAD) return x * Math.PI / 200;
+        return x;
+    }
+    function fromRad(x, mode) {
+        if (mode === DEG) return x * 180 / Math.PI;
+        if (mode === GRAD) return x * 200 / Math.PI;
+        return x;
+    }
+
+    function evalNode(node, scope, mode) {
+        switch (node.type) {
+        case "eq":
+            throw new MathError('Esto es una ecuación — usa "Agregar" para graficarla, el botón "=" es para expresiones sin "=".');
+        case "num": {
+            if (node.v.includes(".")) return V_float(parseFloat(node.v));
+            return V_exact(Frac.fromInt(node.v));
+        }
+        case "const":
+            return node.v === "pi" ? V_float(Math.PI) : V_float(Math.E);
+        case "var": {
+            if (!(node.v in scope)) throw new MathError(`Falta el valor de "${node.v}".`);
+            const val = scope[node.v];
+            return typeof val === "number" ? V_float(val) : V_exact(val);
+        }
+        case "neg": {
+            const a = evalNode(node.a, scope, mode);
+            return a.exact ? V_exact(a.frac.neg()) : V_float(-a.value);
+        }
+        case "fact": {
+            const a = evalNode(node.a, scope, mode);
+            const f = toFloatValue(a);
+            if (!Number.isInteger(f) || f < 0) throw new MathError("El factorial solo aplica a enteros no negativos.");
+            if (f > 5000) throw new MathError("Ese número es demasiado grande para calcular su factorial.");
+            return V_exact(new Frac(bigFactorial(BigInt(f)), 1n));
+        }
+        case "pct": {
+            const a = evalNode(node.a, scope, mode);
+            return a.exact ? V_exact(a.frac.div(Frac.fromInt(100))) : V_float(a.value / 100);
+        }
+        case "bin":
+            return evalBin(node, scope, mode);
+        case "func":
+            return evalFunc(node, scope, mode);
+        default:
+            throw new MathError("Expresión no reconocida.");
+        }
+    }
+
+    function evalBin(node, scope, mode) {
+        const l = evalNode(node.l, scope, mode);
+        const r = evalNode(node.r, scope, mode);
+        if (l.exact && r.exact) {
+        switch (node.op) {
+            case "+": return V_exact(l.frac.add(r.frac));
+            case "-": return V_exact(l.frac.sub(r.frac));
+            case "*": return V_exact(l.frac.mul(r.frac));
+            case "/": return V_exact(l.frac.div(r.frac));
+            case "^": {
+            if (r.frac.isInt()) {
+                const e = r.frac.n;
+                if (e >= 0n && e <= 1000n) {
+                let acc = Frac.fromInt(1);
+                for (let k = 0n; k < e; k++) acc = acc.mul(l.frac);
+                return V_exact(acc);
+                }
+                if (e < 0n && e >= -1000n && !l.frac.isZero()) {
+                let acc = Frac.fromInt(1);
+                for (let k = 0n; k < -e; k++) acc = acc.mul(l.frac);
+                return V_exact(Frac.fromInt(1).div(acc));
+                }
+            }
+            return V_float(Math.pow(l.value, r.value));
+            }
+        }
+        }
+        const a = toFloatValue(l), b = toFloatValue(r);
+        switch (node.op) {
+        case "+": return V_float(a + b);
+        case "-": return V_float(a - b);
+        case "*": return V_float(a * b);
+        case "/": return V_float(a / b);
+        case "^": return V_float(Math.pow(a, b));
+        }
+        throw new MathError("Operador no reconocido.");
+    }
+
+    function evalFunc(node, scope, mode) {
+        const args = node.args.map(a => evalNode(a, scope, mode));
+        const x = toFloatValue(args[0]);
+        switch (node.name) {
+        case "sin": return V_float(Math.sin(toRad(x, mode)));
+        case "cos": return V_float(Math.cos(toRad(x, mode)));
+        case "tan": return V_float(Math.tan(toRad(x, mode)));
+        case "asin": return V_float(fromRad(Math.asin(x), mode));
+        case "acos": return V_float(fromRad(Math.acos(x), mode));
+        case "atan": return V_float(fromRad(Math.atan(x), mode));
+        case "sinh": return V_float(Math.sinh(x));
+        case "cosh": return V_float(Math.cosh(x));
+        case "tanh": return V_float(Math.tanh(x));
+        case "log": return V_float(Math.log10(x));
+        case "ln": return V_float(Math.log(x));
+        case "exp": return V_float(Math.exp(x));
+        case "cbrt": {
+            if (args[0].exact) {
+            const n = args[0].frac;
+            if (n.isInt()) {
+                const r = Math.cbrt(Number(n.n));
+                if (Number.isInteger(r) && r * r * r === Number(n.n)) return V_exact(Frac.fromInt(r));
+            }
+            }
+            return V_float(Math.cbrt(x));
+        }
+        case "sqrt": {
+            if (x < 0) throw new MathError("No existe raíz cuadrada real de un número negativo.");
+            if (args[0].exact) {
+            const s = fracSqrt(args[0].frac);
+            if (s) return V_exact(s);
+            }
+            return V_float(Math.sqrt(x));
+        }
+        case "abs":
+            return args[0].exact ? V_exact(args[0].frac.isNeg() ? args[0].frac.neg() : args[0].frac) : V_float(Math.abs(x));
+        case "root": {
+            const nRoot = toFloatValue(args[1]);
+            if (x < 0 && nRoot % 2 === 0) throw new MathError("No existe esa raíz real de un número negativo.");
+            return V_float(Math.sign(x) === -1 ? -Math.pow(-x, 1 / nRoot) : Math.pow(x, 1 / nRoot));
+        }
+        case "mod": {
+            const b = toFloatValue(args[1]);
+            if (b === 0) throw new MathError("División entre cero.");
+            return V_float(((x % b) + b) % b);
+        }
+        case "gcd": {
+            let a = BigInt(Math.round(Math.abs(x))), b = BigInt(Math.round(Math.abs(toFloatValue(args[1]))));
+            return V_exact(new Frac(bigGcd(a, b), 1n));
+        }
+        case "lcm": {
+            const a = BigInt(Math.round(Math.abs(x))), b = BigInt(Math.round(Math.abs(toFloatValue(args[1]))));
+            if (a === 0n || b === 0n) return V_exact(Frac.fromInt(0));
+            return V_exact(new Frac((a / bigGcd(a, b)) * b, 1n));
+        }
+        case "ncr": case "npr": {
+            const nn = Math.round(x), rr = Math.round(toFloatValue(args[1]));
+            if (nn < 0 || rr < 0 || rr > nn) throw new MathError("Combinación/permutación fuera de rango (se requiere 0 ≤ r ≤ n).");
+            const permNum = bigFactorial(BigInt(nn)) / bigFactorial(BigInt(nn - rr));
+            if (node.name === "npr") return V_exact(new Frac(permNum, 1n));
+            return V_exact(new Frac(permNum / bigFactorial(BigInt(rr)), 1n));
+        }
+        }
+        throw new MathError(`Función "${node.name}" no reconocida.`);
+    }
+
+    function evalFast(node, scope, mode) {
+        switch (node.type) {
+        case "num": return parseFloat(node.v);
+        case "const": return node.v === "pi" ? Math.PI : Math.E;
+        case "var": {
+            const v = scope[node.v];
+            return typeof v === "number" ? v : NaN;
+        }
+        case "neg": return -evalFast(node.a, scope, mode);
+        case "pct": return evalFast(node.a, scope, mode) / 100;
+        case "fact": {
+            const n = evalFast(node.a, scope, mode);
+            if (!Number.isInteger(n) || n < 0 || n > 170) return NaN;
+            let r = 1; for (let i = 2; i <= n; i++) r *= i;
+            return r;
+        }
+        case "bin": {
+            const l = evalFast(node.l, scope, mode), r = evalFast(node.r, scope, mode);
+            switch (node.op) {
+            case "+": return l + r;
+            case "-": return l - r;
+            case "*": return l * r;
+            case "/": return l / r;
+            case "^": return Math.pow(l, r);
+            }
+            return NaN;
+        }
+        case "func": {
+            const a0 = evalFast(node.args[0], scope, mode);
+            switch (node.name) {
+            case "sin": return Math.sin(toRad(a0, mode));
+            case "cos": return Math.cos(toRad(a0, mode));
+            case "tan": return Math.tan(toRad(a0, mode));
+            case "asin": return fromRad(Math.asin(a0), mode);
+            case "acos": return fromRad(Math.acos(a0), mode);
+            case "atan": return fromRad(Math.atan(a0), mode);
+            case "sinh": return Math.sinh(a0);
+            case "cosh": return Math.cosh(a0);
+            case "tanh": return Math.tanh(a0);
+            case "log": return Math.log10(a0);
+            case "ln": return Math.log(a0);
+            case "exp": return Math.exp(a0);
+            case "sqrt": return a0 < 0 ? NaN : Math.sqrt(a0);
+            case "cbrt": return Math.cbrt(a0);
+            case "abs": return Math.abs(a0);
+            case "root": {
+                const n = evalFast(node.args[1], scope, mode);
+                if (a0 < 0 && n % 2 === 0) return NaN;
+                return a0 < 0 ? -Math.pow(-a0, 1 / n) : Math.pow(a0, 1 / n);
+            }
+            case "mod": {
+                const b = evalFast(node.args[1], scope, mode);
+                return b === 0 ? NaN : ((a0 % b) + b) % b;
+            }
+            case "gcd": case "lcm": case "ncr": case "npr": {
+                return NaN;
+            }
+            }
+            return NaN;
+        }
+        default: return NaN;
+        }
+    }
+
+    function sampleCurve(input, xValues, mode) {
+        let ast;
+        try { ast = parse(input); } catch (e) { return null; }
+        if (ast.type === "eq") return null;
+        const vars = collectVars(ast, new Set());
+        if (vars.has("y") || vars.has("z")) return null;
+        const scope = {};
+        const ys = new Array(xValues.length);
+        for (let i = 0; i < xValues.length; i++) {
+        scope.x = xValues[i];
+        try { ys[i] = evalFast(ast, scope, mode); } catch (e) { ys[i] = NaN; }
+        }
+        return ys;
+    }
+
+    function evaluate(input, opts) {
+        opts = opts || {};
+        const scope = opts.scope || {};
+        const mode = opts.mode || RAD;
+        const ast = parse(input);
+        const result = evalNode(ast, scope, mode);
+        const decimal = toFloatValue(result);
+        return {
+        decimal,
+        exact: result.exact ? result.frac.toString() : null,
+        isExactInteger: result.exact && result.frac.isInt(),
+        };
+    }
+
+    const FUNC_LATEX = {
+        sin: "\\sin", cos: "\\cos", tan: "\\tan",
+        asin: "\\arcsin", acos: "\\arccos", atan: "\\arctan",
+        sinh: "\\sinh", cosh: "\\cosh", tanh: "\\tanh",
+        log: "\\log", ln: "\\ln", exp: "\\exp",
+    };
+    function prec(node) {
+        if (node.type === "bin") return { "+": 1, "-": 1, "*": 2, "/": 2, "^": 4 }[node.op];
+        if (node.type === "neg") return 3;
+        return 5;
+    }
+    function toLatexNode(node, parentPrec) {
+        let s, p;
+        switch (node.type) {
+        case "eq": s = `${toLatexNode(node.l, 0)}=${toLatexNode(node.r, 0)}`; p = 0; break;
+        case "num": s = node.v; p = 5; break;
+        case "const": s = node.v === "pi" ? "\\pi" : "e"; p = 5; break;
+        case "var": s = node.v; p = 5; break;
+        case "neg": s = `-${toLatexNode(node.a, 3)}`; p = 3; break;
+        case "fact": s = `${toLatexNode(node.a, 5)}!`; p = 5; break;
+        case "pct": s = `${toLatexNode(node.a, 5)}\\%`; p = 5; break;
+        case "func": {
+            const inner = node.args.map(a => toLatexNode(a, 0)).join(",\\ ");
+            if (node.name === "sqrt") { s = `\\sqrt{${inner}}`; p = 5; break; }
+            if (node.name === "cbrt") { s = `\\sqrt[3]{${inner}}`; p = 5; break; }
+            if (node.name === "root") { s = `\\sqrt[${toLatexNode(node.args[1], 0)}]{${toLatexNode(node.args[0], 0)}}`; p = 5; break; }
+            if (node.name === "abs") { s = `\\left|${inner}\\right|`; p = 5; break; }
+            if (node.name === "gcd" || node.name === "lcm") { s = `\\operatorname{${node.name}}\\left(${inner}\\right)`; p = 5; break; }
+            if (node.name === "ncr") { s = `{}_{${toLatexNode(node.args[0], 0)}}C_{${toLatexNode(node.args[1], 0)}}`; p = 5; break; }
+            if (node.name === "npr") { s = `{}_{${toLatexNode(node.args[0], 0)}}P_{${toLatexNode(node.args[1], 0)}}`; p = 5; break; }
+            if (node.name === "mod") { s = `${toLatexNode(node.args[0], 2)}\\ \\operatorname{mod}\\ ${toLatexNode(node.args[1], 2)}`; p = 1; break; }
+            const fname = FUNC_LATEX[node.name] || `\\operatorname{${node.name}}`;
+            s = `${fname}\\left(${inner}\\right)`; p = 5;
+            break;
+        }
+        case "bin": {
+            if (node.op === "/") { s = `\\frac{${toLatexNode(node.l, 0)}}{${toLatexNode(node.r, 0)}}`; p = 5; break; }
+            if (node.op === "^") {
+            const base = toLatexNode(node.l, 4.5);
+            const exp = toLatexNode(node.r, 0);
+            s = `${base}^{${exp}}`; p = 4;
+            break;
+            }
+            const opTex = node.op === "*"
+            ? (node.implicit ? "" : "\\cdot ")
+            : { "+": "+", "-": "-" }[node.op];
+            const l = toLatexNode(node.l, prec(node));
+            const r = toLatexNode(node.r, prec(node) + (node.op === "-" ? 1 : 0));
+            s = `${l}${opTex}${r}`;
+            p = prec(node);
+            break;
+        }
+        default: s = "?"; p = 5;
+        }
+        return p < parentPrec ? `\\left(${s}\\right)` : s;
+    }
+
+    function toLatex(input) {
+        const ast = parse(input);
+        return toLatexNode(ast, 0);
+    }
+
+    function toBackendNode(node) {
+        switch (node.type) {
+        case "eq": return `${toBackendNode(node.l)}=${toBackendNode(node.r)}`;
+        case "num": return node.v;
+        case "const": return node.v === "pi" ? "pi" : "E";
+        case "var": return node.v;
+        case "neg": return `-(${toBackendNode(node.a)})`;
+        case "fact": return `factorial(${toBackendNode(node.a)})`;
+        case "pct": return `((${toBackendNode(node.a)})/100)`;
+        case "func": {
+            const a = node.args.map(toBackendNode);
+            if (node.name === "mod") return `Mod(${a[0]},${a[1]})`;
+            if (node.name === "ncr") return `binomial(${a[0]},${a[1]})`;
+            if (node.name === "npr") return `(factorial(${a[0]})/factorial((${a[0]})-(${a[1]})))`;
+            if (node.name === "cbrt") return `(sign(${a[0]})*Abs(${a[0]})**(1/3))`;
+            if (node.name === "root") {
+            const nNode = node.args[1];
+            if (nNode.type === "num" && !nNode.v.includes(".")) {
+                const nInt = parseInt(nNode.v, 10);
+                if (nInt % 2 === 1) return `(sign(${a[0]})*Abs(${a[0]})**(1/${nInt}))`;
+            }
+            return `root(${a[0]},${a[1]})`;
+            }
+            return `${node.name}(${a.join(",")})`;
+        }
+        case "bin": {
+            const l = toBackendNode(node.l), r = toBackendNode(node.r);
+            const op = node.op === "^" ? "**" : node.op;
+            return `(${l}${op}${r})`;
+        }
+        default: throw new MathError("Expresión no reconocida.");
+        }
+    }
+    function toBackendSyntax(input) {
+        return toBackendNode(parse(input));
+    }
+
+    const NOT_VECTORIZABLE = new Set(["fact"]); 
+    const NOT_VECTORIZABLE_FN = new Set(["gcd", "lcm", "ncr", "npr"]);
+    function findUngraphable(node, plotVars, found) {
+        if (!node) return found;
+        const isRisky = (node.type === "fact") || (node.type === "func" && NOT_VECTORIZABLE_FN.has(node.name));
+        if (isRisky) {
+        const argVars = node.type === "fact" ? collectVars(node.a, new Set()) : collectVars({ type: "func", name: "_", args: node.args }, new Set());
+        if (plotVars.some(v => argVars.has(v))) {
+            found.add(node.type === "fact" ? "factorial" : node.name);
+        }
+        }
+        if (node.type === "eq") { findUngraphable(node.l, plotVars, found); findUngraphable(node.r, plotVars, found); }
+        if (node.type === "bin") { findUngraphable(node.l, plotVars, found); findUngraphable(node.r, plotVars, found); }
+        if (node.type === "neg" || node.type === "pct") findUngraphable(node.a, plotVars, found);
+        if (node.type === "fact") findUngraphable(node.a, plotVars, found);
+        if (node.type === "func") node.args.forEach(a => findUngraphable(a, plotVars, found));
+        return found;
+    }
+    const GRAPH_LABEL = { factorial: "factorial (!)", gcd: "gcd", lcm: "lcm", ncr: "nCr", npr: "nPr" };
+    function checkGraphable(input, plotVars) {
+        try {
+        const ast = parse(input);
+        const bad = findUngraphable(ast, plotVars, new Set());
+        if (bad.size) {
+            const names = Array.from(bad).map(n => GRAPH_LABEL[n] || n).join(", ");
+            return { ok: false, reason: `${names} no se puede graficar cuando depende de la variable — funciona en "=" pero no en la gráfica.` };
+        }
+        return { ok: true };
+        } catch (e) {
+        return { ok: false, reason: e.message || "Expresión incompleta." };
+        }
+    }
+
+    function formatPreviewLatex(input) {
+        if (!input || !input.trim()) return { ok: true, latex: "" };
+        try {
+        return { ok: true, latex: toLatex(input) };
+        } catch (e) {
+        return { ok: false, latex: "", error: e.message || "Expresión incompleta." };
+        }
+    }
+
+    function getGraphKind(input) {
+        try {
+        const ast = parse(input);
+        const vars = Array.from(collectVars(ast, new Set()));
+        if (vars.includes("z")) return "implicit";
+        if (ast.type === "eq") return "curve";
+        if (vars.includes("y")) return "surface";
+        return "curve";
+        } catch (e) {
+        return "curve";
+        }
+    }
+
+    return {
+        MathError,
+        tokenize,
+        parse,
+        toLatex,
+        formatPreviewLatex,
+        evaluate,
+        getVariables,
+        getGraphKind,
+        toBackendSyntax,
+        checkGraphable,
+        sampleCurve,
+        MODES: { DEG, RAD, GRAD },
+    };
+    });
+  </script>
+
+  <script>
+    window.BACKEND_URL = window.BACKEND_URL || "http://127.0.0.1:8000";
+
+    const TeoremaAPI = (function () {
+    "use strict";
+
+    function withTimeout(promise, ms) {
+        let timer;
+        const timeout = new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error("TIMEOUT")), ms);
+        });
+        return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+    }
+
+    async function fetchPuntos(path, polinomio, extraParams) {
+        const qs = new URLSearchParams({ polinomio, ...(extraParams || {}) });
+        const url = `${window.BACKEND_URL}${path}?${qs.toString()}`;
+        let respuesta;
+        try {
+        respuesta = await withTimeout(fetch(url), 15000);
+        } catch (e) {
+        if (e.message === "TIMEOUT") {
+            throw new Error("El servidor está tardando demasiado en responder.");
+        }
+        throw new Error("No se pudo conectar con el servidor backend.");
+        }
+        let datos;
+        try {
+        datos = await respuesta.json();
+        } catch (e) {
+        throw new Error("El servidor respondió con un formato inesperado.");
+        }
+        if (!respuesta.ok || datos.status !== "success") {
+        throw new Error(datos && datos.data ? String(datos.data) : "El servidor no pudo procesar la expresión.");
+        }
+        return datos;
+    }
+
+    async function fetchSuperficie(ecuacion, rango, resolucion) {
+        const qs = new URLSearchParams({ ecuacion, rango: String(rango || 8), resolucion: String(resolucion || 60) });
+        const url = `${window.BACKEND_URL}/superficie_3d?${qs.toString()}`;
+        let respuesta;
+        try {
+        respuesta = await withTimeout(fetch(url), 20000);
+        } catch (e) {
+        if (e.message === "TIMEOUT") {
+            throw new Error("El servidor está tardando demasiado en calcular la superficie.");
+        }
+        throw new Error("No se pudo conectar con el servidor backend.");
+        }
+        let datos;
+        try {
+        datos = await respuesta.json();
+        } catch (e) {
+        throw new Error("El servidor respondió con un formato inesperado.");
+        }
+        if (!respuesta.ok || datos.status !== "success") {
+        throw new Error(datos && datos.data ? String(datos.data) : "El servidor no pudo procesar la ecuación.");
+        }
+        return datos;
+    }
+
+    async function fetchInterseccion3D(ecuaciones, rango, resolucion) {
+        const url = `${window.BACKEND_URL}/interseccion_3d`;
+        let respuesta;
+        try {
+        respuesta = await withTimeout(fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ecuaciones, rango, resolucion }),
+        }), 20000);
+        } catch (e) {
+        if (e.message === "TIMEOUT") throw new Error("El servidor está tardando demasiado en calcular la superposición.");
+        throw new Error("No se pudo conectar con el servidor backend.");
+        }
+        let datos;
+        try {
+        datos = await respuesta.json();
+        } catch (e) {
+        throw new Error("El servidor respondió con un formato inesperado.");
+        }
+        if (!respuesta.ok || datos.status !== "success") {
+        throw new Error(datos && datos.data ? String(datos.data) : "El servidor no pudo calcular la superposición.");
+        }
+        return datos;
+    }
+
+    async function fetchEvaluarPuntos(ecuaciones, x, y, z) {
+        const url = `${window.BACKEND_URL}/evaluar_en_puntos`;
+        let respuesta;
+        try {
+        respuesta = await withTimeout(fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ecuaciones, x, y, z }),
+        }), 20000);
+        } catch (e) {
+        if (e.message === "TIMEOUT") {
+            throw new Error("El servidor está tardando demasiado en evaluar los puntos.");
+        }
+        throw new Error("No se pudo conectar con el servidor backend.");
+        }
+        let datos;
+        try {
+        datos = await respuesta.json();
+        } catch (e) {
+        throw new Error("El servidor respondió con un formato inesperado.");
+        }
+        if (!respuesta.ok || datos.status !== "success") {
+        throw new Error(datos && datos.data ? String(datos.data) : "El servidor no pudo evaluar los puntos.");
+        }
+        return datos;
+    }
+
+    return {
+        puntos2D: (polinomio, dominio, puntos) => fetchPuntos("/puntos_2d", polinomio, {
+        ...(dominio ? { dominio_min: dominio[0], dominio_max: dominio[1] } : {}),
+        ...(puntos ? { puntos } : {}),
+        }),
+        puntos3D: (polinomio, rango, resolucion) => fetchPuntos("/puntos_3d", polinomio, {
+        ...(rango ? { rango } : {}),
+        ...(resolucion ? { resolucion } : {}),
+        }),
+        superficie3D: (ecuacion, rango, resolucion) => fetchSuperficie(ecuacion, rango, resolucion),
+        evaluarEnPuntos: (ecuaciones, x, y, z) => fetchEvaluarPuntos(ecuaciones, x, y, z),
+        interseccion3D: (ecuaciones, rango, resolucion) => fetchInterseccion3D(ecuaciones, rango, resolucion),
+    };
+    })();  
+  </script>
+
+  <script>
+    const TeoremaUI = (function () {
+    "use strict";
+
+    function insertAtCursor(input, text, cursorOffset) {
+        cursorOffset = cursorOffset || 0;
+        const s = input.selectionStart ?? input.value.length;
+        const e = input.selectionEnd ?? input.value.length;
+        input.value = input.value.slice(0, s) + text + input.value.slice(e);
+        const next = s + text.length + cursorOffset;
+        input.focus();
+        input.setSelectionRange(Math.max(0, next), Math.max(0, next));
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+
+    function backspaceAtCursor(input) {
+        const s = input.selectionStart ?? input.value.length;
+        const e = input.selectionEnd ?? input.value.length;
+        if (s !== e) {
+        input.value = input.value.slice(0, s) + input.value.slice(e);
+        input.focus(); input.setSelectionRange(s, s);
+        } else if (s > 0) {
+        input.value = input.value.slice(0, s - 1) + input.value.slice(s);
+        input.focus(); input.setSelectionRange(s - 1, s - 1);
+        }
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+
+    const KEY_GROUPS = [
+        { title: "Variables", cols: 3, cls: "key-var", keys: [
+        { label: "x", insert: "x" }, { label: "y", insert: "y" }, { label: "z", insert: "z" },
+        ]},
+        { title: "Constantes", cols: 2, cls: "key-const", keys: [
+        { label: "π", insert: "π" }, { label: "e", insert: "e" },
+        ]},
+        { title: "Números", cols: 3, cls: "key-num", keys: [
+        { label: "7", insert: "7" }, { label: "8", insert: "8" }, { label: "9", insert: "9" },
+        { label: "4", insert: "4" }, { label: "5", insert: "5" }, { label: "6", insert: "6" },
+        { label: "1", insert: "1" }, { label: "2", insert: "2" }, { label: "3", insert: "3" },
+        { label: "0", insert: "0" }, { label: ".", insert: "." }, { label: "⌫", action: "backspace" },
+        ]},
+        { title: "Operadores", cols: 4, cls: "key-op", keys: [
+        { label: "AC", action: "clear", cls: "key-clear" }, { label: "(", insert: "(" }, { label: ")", insert: ")" }, { label: "=", insert: "=" },
+        { label: "÷", insert: "/" }, { label: "×", insert: "*" }, { label: "−", insert: "-" }, { label: "+", insert: "+" },
+        ]},
+        { title: "Potencias y raíces", cols: 3, cls: "key-fn", keys: [
+        { label: "x²", insert: "^2" }, { label: "x³", insert: "^3" }, { label: "xʸ", insert: "^" },
+        { label: "√x", insert: "sqrt()", offset: -1 }, { label: "∛x", insert: "cbrt()", offset: -1 }, { label: "ⁿ√x", insert: "root(,)", offset: -2 },
+        ]},
+        { title: "Trigonometría", cols: 3, cls: "key-fn", collapsed: true, keys: [
+        { label: "sin", insert: "sin()", offset: -1 }, { label: "cos", insert: "cos()", offset: -1 }, { label: "tan", insert: "tan()", offset: -1 },
+        { label: "sin⁻¹", insert: "asin()", offset: -1 }, { label: "cos⁻¹", insert: "acos()", offset: -1 }, { label: "tan⁻¹", insert: "atan()", offset: -1 },
+        { label: "sinh", insert: "sinh()", offset: -1 }, { label: "cosh", insert: "cosh()", offset: -1 }, { label: "tanh", insert: "tanh()", offset: -1 },
+        ]},
+        { title: "Logaritmos y otras", cols: 3, cls: "key-fn", collapsed: true, keys: [
+        { label: "log", insert: "log()", offset: -1 }, { label: "ln", insert: "ln()", offset: -1 }, { label: "exp", insert: "exp()", offset: -1 },
+        { label: "|x|", insert: "abs()", offset: -1 }, { label: "n!", insert: "!" }, { label: "%", insert: "%" },
+        ]},
+        { title: "Combinatoria", cols: 3, cls: "key-fn", collapsed: true, keys: [
+        { label: "mod", insert: "mod(,)", offset: -2 }, { label: "gcd", insert: "gcd(,)", offset: -2 }, { label: "lcm", insert: "lcm(,)", offset: -2 },
+        { label: "nCr", insert: "ncr(,)", offset: -2 }, { label: "nPr", insert: "npr(,)", offset: -2 },
+        ]},
+        { title: "Memoria", cols: 4, cls: "key-mem", collapsed: true, keys: [
+        { label: "MC", action: "mc" }, { label: "MR", action: "mr" }, { label: "M+", action: "mplus" }, { label: "M−", action: "mminus" },
+        ]},
+    ];
+
+    function renderKeypad(container, handlers) {
+        container.innerHTML = "";
+        KEY_GROUPS.forEach(group => {
+        const wrap = document.createElement("div");
+        wrap.className = `keypad-group${group.collapsed ? " collapsed" : ""}`;
+        const title = document.createElement("p");
+        title.className = "section-title";
+        title.innerHTML = `<span>${group.title}</span><span class="chev">▾</span>`;
+        title.addEventListener("click", () => wrap.classList.toggle("collapsed"));
+        wrap.appendChild(title);
+        const grid = document.createElement("div");
+        grid.className = `keypad-grid cols-${group.cols}`;
+        group.keys.forEach(k => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = `key ${group.cls}${k.cls ? " " + k.cls : ""}`;
+            btn.textContent = k.label;
+            btn.setAttribute("aria-label", k.label);
+            btn.addEventListener("click", () => {
+            if (k.action && handlers.onAction) handlers.onAction(k.action);
+            else if (k.insert && handlers.onInsert) handlers.onInsert(k.insert, k.offset || 0);
+            });
+            grid.appendChild(btn);
+        });
+        wrap.appendChild(grid);
+        container.appendChild(wrap);
+        });
+    }
+
+    function renderHistory(container, items, handlers) {
+        container.innerHTML = "";
+        if (!items.length) {
+        container.innerHTML = '<p class="empty-note">Aún no hay operaciones en el historial.</p>';
+        return;
+        }
+        items.slice().reverse().forEach(item => {
+        const row = document.createElement("div");
+        row.className = "hist-item";
+        row.innerHTML = `
+            <div class="hist-main">
+            <span class="hist-latex"></span>
+            <span class="hist-meta">${item.tipo} · ${item.hora}</span>
+            </div>
+            <div class="hist-actions">
+            <button type="button" data-act="reuse" title="Reutilizar">↺</button>
+            <button type="button" data-act="edit" title="Editar">✎</button>
+            <button type="button" data-act="delete" title="Eliminar">✕</button>
+            </div>`;
+        row.querySelector(".hist-latex").textContent = `${item.expresion}${item.resultado ? " = " + item.resultado : ""}`;
+        row.querySelector('[data-act="reuse"]').addEventListener("click", () => handlers.onReuse(item));
+        row.querySelector('[data-act="edit"]').addEventListener("click", () => handlers.onEdit(item));
+        row.querySelector('[data-act="delete"]').addEventListener("click", () => handlers.onDelete(item));
+        container.appendChild(row);
+        });
+    }
+
+    function renderFunctions(container, items, handlers) {
+        container.innerHTML = "";
+        if (!items.length) {
+        container.innerHTML = '<p class="empty-note">Agrega una función para graficarla.</p>';
+        return;
+        }
+        items.forEach(fn => {
+        const row = document.createElement("div");
+        row.className = `fn-item${fn.visible ? "" : " is-hidden"}`;
+        const expr = fn.expr || "…";
+        const label = fn.isEquation ? `${fn.label}:\u00A0${expr}` : `${fn.label}(${fn.varsLabel || "x"}) = ${expr}`;
+        row.innerHTML = `
+            <span class="fn-swatch" style="background:${fn.color}"></span>
+            <span class="fn-expr"></span>
+            <div class="fn-actions">
+            <button type="button" data-act="toggle" title="Mostrar/ocultar">${fn.visible ? "👁" : "🚫"}</button>
+            <button type="button" data-act="edit" title="Editar">✎</button>
+            <button type="button" data-act="delete" title="Eliminar">✕</button>
+            </div>`;
+        row.querySelector(".fn-expr").textContent = label;
+        row.querySelector('[data-act="toggle"]').addEventListener("click", () => handlers.onToggle(fn));
+        row.querySelector('[data-act="edit"]').addEventListener("click", () => handlers.onEdit(fn));
+        row.querySelector('[data-act="delete"]').addEventListener("click", () => handlers.onDelete(fn));
+        container.appendChild(row);
+        });
+    }
+
+    function showToast(message, kind) {
+        const stack = document.getElementById("toastStack");
+        if (!stack) { return; }
+        const toast = document.createElement("div");
+        toast.className = `toast${kind ? " toast-" + kind : ""}`;
+        toast.textContent = message;
+        stack.appendChild(toast);
+        setTimeout(() => toast.remove(), 4200);
+    }
+
+    function openModal(id) { const m = document.getElementById(id); if (m) m.classList.add("open"); }
+    function closeModal(id) { const m = document.getElementById(id); if (m) m.classList.remove("open"); }
+
+    function initTabs(root) {
+        const buttons = root.querySelectorAll(".tab-btn");
+        const addRow = root.querySelector(".add-fn-row"); 
+
+        buttons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            buttons.forEach(b => b.classList.remove("active"));
+            root.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+            btn.classList.add("active");
+            root.querySelector(`#${btn.dataset.tab}`).classList.add("active");
+
+            if (btn.dataset.tab === "historyTab") {
+                if (addRow) addRow.style.display = "none";
+            } else {
+                if (addRow) addRow.style.display = "flex";
+            }
+        });
+        });
+    }
+
+    return {
+        insertAtCursor, backspaceAtCursor, KEY_GROUPS, renderKeypad,
+        renderHistory, renderFunctions, showToast, openModal, closeModal, initTabs,
+    };
+    })();
+  </script>
+
+  <script>
+    const TeoremaCalculator = (function () {
+    "use strict";
+
+    const state = {
+        mode: "RAD",
+        memory: 0,
+    };
+
+    let inputEl, previewEl, resultBoxEl, modeButtonsEl;
+    let onExpressionChange = () => {};
+    let onHistoryEntry = () => {};
+
+    function formatDecimal(value) {
+        if (Number.isNaN(value)) return "Indefinido";
+        if (value === Infinity) return "∞";
+        if (value === -Infinity) return "−∞";
+        if (Number.isInteger(value) && Math.abs(value) < 1e15) return String(value);
+        const rounded = parseFloat(value.toPrecision(10));
+        return String(rounded);
+    }
+
+    function updatePreview() {
+        const raw = inputEl.value;
+        onExpressionChange(raw);
+        if (!raw.trim()) {
+        previewEl.innerHTML = "";
+        previewEl.classList.remove("has-error");
+        return;
+        }
+        const r = TeoremaMath.formatPreviewLatex(raw);
+        if (r.ok) {
+        previewEl.classList.remove("has-error");
+        previewEl.innerHTML = `\\[${r.latex}\\]`;
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            window.MathJax.typesetPromise([previewEl]).catch(() => {});
+        }
+        } else {
+        previewEl.classList.add("has-error");
+        previewEl.textContent = r.error;
+        }
+    }
+
+    function setMode(mode) {
+        state.mode = mode;
+        modeButtonsEl.querySelectorAll("button").forEach(b => b.classList.toggle("active", b.dataset.mode === mode));
+    }
+
+    function currentValueForMemory() {
+        try {
+        return TeoremaMath.evaluate(inputEl.value, { mode: state.mode }).decimal;
+        } catch (e) {
+        return null;
+        }
+    }
+
+    function handleAction(action) {
+        switch (action) {
+        case "backspace": TeoremaUI.backspaceAtCursor(inputEl); break;
+        case "clear":
+            inputEl.value = "";
+            inputEl.focus();
+            inputEl.dispatchEvent(new Event("input", { bubbles: true }));
+            clearResult();
+            break;
+        case "mc": state.memory = 0; TeoremaUI.showToast("Memoria borrada.", "ok"); break;
+        case "mr": TeoremaUI.insertAtCursor(inputEl, formatDecimal(state.memory), 0); break;
+        case "mplus": {
+            const v = currentValueForMemory();
+            if (v === null || Number.isNaN(v)) { TeoremaUI.showToast("No hay un resultado válido para sumar a memoria."); break; }
+            state.memory += v; TeoremaUI.showToast(`Memoria: ${formatDecimal(state.memory)}`, "ok"); break;
+        }
+        case "mminus": {
+            const v = currentValueForMemory();
+            if (v === null || Number.isNaN(v)) { TeoremaUI.showToast("No hay un resultado válido para restar de memoria."); break; }
+            state.memory -= v; TeoremaUI.showToast(`Memoria: ${formatDecimal(state.memory)}`, "ok"); break;
+        }
+        }
+    }
+
+    function clearResult() {
+        resultBoxEl.classList.remove("result-error");
+        resultBoxEl.innerHTML = '<p class="result-decimal">0</p>';
+    }
+
+    function evaluateNow() {
+        const raw = inputEl.value;
+        if (!raw.trim()) return;
+        try {
+        const result = TeoremaMath.evaluate(raw, { mode: state.mode });
+        resultBoxEl.classList.remove("result-error");
+        const decimalStr = formatDecimal(result.decimal);
+        const showExact = result.exact !== null && result.exact !== decimalStr && !result.isExactInteger;
+        resultBoxEl.innerHTML = `
+            <p class="result-decimal">${decimalStr}</p>
+            ${showExact ? `<p class="result-exact">Forma exacta: ${result.exact}</p>` : ""}
+        `;
+        onHistoryEntry({
+            expresion: raw,
+            resultado: decimalStr,
+            tipo: "Cálculo",
+            hora: new Date().toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" }),
+        });
+        } catch (e) {
+        resultBoxEl.classList.add("result-error");
+        resultBoxEl.innerHTML = `<p class="result-decimal">${e.message || "No se pudo evaluar la expresión."}</p>`;
+        }
+    }
+
+    function setExpression(expr) {
+        inputEl.value = expr;
+        inputEl.focus();
+        updatePreview();
+    }
+
+    function init(opts) {
+        inputEl = opts.input;
+        previewEl = opts.preview;
+        resultBoxEl = opts.resultBox;
+        modeButtonsEl = opts.modeButtons;
+        onExpressionChange = opts.onExpressionChange || onExpressionChange;
+        onHistoryEntry = opts.onHistoryEntry || onHistoryEntry;
+
+        inputEl.addEventListener("input", updatePreview);
+        modeButtonsEl.querySelectorAll("button").forEach(b => {
+        b.addEventListener("click", () => setMode(b.dataset.mode));
+        });
+        clearResult();
+        updatePreview();
+    }
+
+    return {
+        init, updatePreview, evaluateNow, handleAction, setExpression,
+        insert: (text, offset) => TeoremaUI.insertAtCursor(inputEl, text, offset),
+        getExpression: () => inputEl.value,
+        getMode: () => state.mode,
+    };
+    })();
+  </script>
+
+  <script>
+    const TeoremaGraph = (function () {
+    "use strict";
+
+    const COLORS = ["var(--fn-0)", "var(--fn-1)", "var(--fn-2)", "var(--fn-3)", "var(--fn-4)", "var(--fn-5)"];
+    const RESOLVED_COLORS = ["#124b68", "#c27a2c", "#137a4b", "#7c3aed", "#be185d", "#0b6b6f"];
+
+    function colorInk() {
+        return getComputedStyle(document.body).getPropertyValue("--ink").trim() || "#18202f";
+    }
+    function hexARgb(hex) {
+        const limpio = String(hex).replace("#", "");
+        const completo = limpio.length === 3 ? limpio.split("").map(c => c + c).join("") : limpio;
+        const n = parseInt(completo, 16) || 0;
+        return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+    }
+    function rgbAHex({ r, g, b }) {
+        const c = (v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0");
+        return `#${c(r)}${c(g)}${c(b)}`;
+    }
+    function colorSuperposicion(colores) {
+        const rgbs = colores.map(hexARgb);
+        const prom = rgbs.reduce((a, c) => ({ r: a.r + c.r, g: a.g + c.g, b: a.b + c.b }), { r: 0, g: 0, b: 0 });
+        const n = rgbs.length || 1;
+        const OSCURECER = 0.68;
+        return rgbAHex({ r: (prom.r / n) * OSCURECER, g: (prom.g / n) * OSCURECER, b: (prom.b / n) * OSCURECER });
+    }
+
+    function calcularRangoY(series) {
+        let min = Infinity, max = -Infinity;
+        for (const serie of series) {
+        for (const v of serie) {
+            if (typeof v === "number" && Number.isFinite(v)) {
+            if (v < min) min = v;
+            if (v > max) max = v;
+            }
+        }
+        }
+        if (!Number.isFinite(min) || !Number.isFinite(max)) return null; 
+        if (min === max) { 
+        const margen = Math.max(Math.abs(min) * 0.15, 1);
+        return [min - margen, max + margen];
+        }
+        const margen = (max - min) * 0.15;
+        return [min - margen, max + margen];
+    }
+
+    function triangulosDeGrilla(filas, cols) {
+        const tris = [];
+        const idx = (r, c) => r * cols + c;
+        for (let r = 0; r < filas - 1; r++) {
+        for (let c = 0; c < cols - 1; c++) {
+            const v00 = idx(r, c), v01 = idx(r, c + 1), v10 = idx(r + 1, c), v11 = idx(r + 1, c + 1);
+            tris.push([v00, v01, v10]);
+            tris.push([v01, v11, v10]);
+        }
+        }
+        return tris;
+    }
+    function segmentosDeInterseccion(px, py, pz, triangulos, valores) {
+        const segmentos = [];
+        for (const [a, b, c] of triangulos) {
+        const fa = valores[a], fb = valores[b], fc = valores[c];
+        if (![fa, fb, fc].every(v => typeof v === "number" && Number.isFinite(v))) continue;
+        const cruces = [];
+        for (const [i1, i2, v1, v2] of [[a, b, fa, fb], [b, c, fb, fc], [c, a, fc, fa]]) {
+            if ((v1 <= 0 && v2 > 0) || (v1 > 0 && v2 <= 0)) {
+            const t = v1 / (v1 - v2);
+            cruces.push([px[i1] + t * (px[i2] - px[i1]), py[i1] + t * (py[i2] - py[i1]), pz[i1] + t * (pz[i2] - pz[i1])]);
+            }
+        }
+        if (cruces.length === 2) segmentos.push(cruces);
+        }
+        return segmentos;
+    }
+
+    let redrawToken = 0; 
+    let plotEl, emptyEl, fnListEl, dimPillEl, zoomInEl, zoomOutEl;
+    let functions = []; 
+    let nextIndex = 1;
+    let view = { grid: true, axes: true, legend: true, range: 8 };
+    let graphMode = "auto"; 
+    let domain2D = null; 
+    let domain3D = null; 
+    let modoActual3D = false; 
+    let mostrarInterseccionVolumen = true; 
+    let relayoutTimer = null;
+    let viewportTrackingAttached = false;
+    let onFunctionsChanged = () => {};
+
+    function nextColor() { return RESOLVED_COLORS[(nextIndex - 1) % RESOLVED_COLORS.length]; }
+
+    function addFunction(expr) {
+        const fn = { id: `f${Date.now()}${nextIndex}`, label: `f${nextIndex}`, color: nextColor(), expr: expr || "", visible: true };
+        nextIndex++;
+        functions.push(fn);
+        renderList();
+        redraw();
+        return fn;
+    }
+    function updateFunction(id, expr) {
+        const fn = functions.find(f => f.id === id);
+        if (fn) { fn.expr = expr; renderList(); redraw(); }
+    }
+    function toggleFunction(id) {
+        const fn = functions.find(f => f.id === id);
+        if (fn) { fn.visible = !fn.visible; renderList(); redraw(); }
+    }
+    function removeFunction(id) {
+        functions = functions.filter(f => f.id !== id);
+        renderList(); redraw();
+    }
+
+    function renderList() {
+        const withDim = functions.map(f => {
+        const kind = TeoremaMath.getGraphKind(f.expr);
+        return { ...f, is3D: kind !== "curve", isEquation: f.expr.includes("="), varsLabel: kind === "implicit" ? "x,y,z" : kind === "surface" ? "x,y" : "x" };
+        });
+        TeoremaUI.renderFunctions(fnListEl, withDim, {
+        onToggle: (fn) => toggleFunction(fn.id),
+        onEdit: (fn) => onFunctionsChanged({ type: "edit", fn }),
+        onDelete: (fn) => removeFunction(fn.id),
+        });
+    }
+
+    function showEmpty(msg) {
+        if (plotEl.dataset.plotted === "1") {
+        try { Plotly.purge(plotEl); } catch (e) { }
+        plotEl.dataset.plotted = "0";
+        }
+        plotEl.innerHTML = "";
+        plotEl.style.display = "none";
+        emptyEl.style.display = "grid";
+        emptyEl.querySelector("strong").textContent = msg || "Escribe una función y agrégala para verla aquí.";
+    }
+    function showPlot() {
+        emptyEl.style.display = "none";
+        plotEl.style.display = "block";
+    }
+    function setZoomButtons(enabled) {
+        if (zoomInEl) zoomInEl.disabled = !enabled;
+        if (zoomOutEl) zoomOutEl.disabled = !enabled;
+    }
+
+    function toSafeBackendExpr(expr) {
+        try { return TeoremaMath.toBackendSyntax(expr); } catch (e) { return expr; }
+    }
+
+    function applyGraphModeOverride(kind) {
+        if (graphMode === "2d") return "curve";
+        if (graphMode === "3d") return kind === "curve" ? "surface" : kind;
+        return kind; 
+    }
+
+    async function redraw() {
+        const myToken = ++redrawToken;
+        const active = functions.filter(f => f.visible && f.expr && f.expr.trim());
+        if (!active.length) { if (myToken === redrawToken) { showEmpty(); dimPillEl.textContent = "—"; setZoomButtons(false); } return; }
+
+        const withKind = active.map(f => ({ fn: f, kind: applyGraphModeOverride(TeoremaMath.getGraphKind(f.expr)), vars: TeoremaMath.getVariables(f.expr) }));
+        const has3D = withKind.some(v => v.kind !== "curve");
+        if (myToken === redrawToken) { dimPillEl.textContent = has3D ? "3D" : "2D"; setZoomButtons(true); modoActual3D = has3D; }
+
+        let group = has3D ? withKind.filter(v => v.kind !== "curve") : withKind;
+        if (has3D && group.length < withKind.length && myToken === redrawToken) {
+        TeoremaUI.showToast("Se muestran solo las funciones 3D mientras haya una activa; una gráfica no puede mezclar 2D y 3D a la vez.");
+        }
+
+        const blocked = [];
+        group = group.filter(v => {
+        const check = TeoremaMath.checkGraphable(v.fn.expr, v.vars);
+        if (!check.ok) { blocked.push(`${v.fn.label}: ${check.reason}`); return false; }
+        return true;
+        });
+        if (blocked.length && myToken === redrawToken) TeoremaUI.showToast(blocked.join(" · "));
+        if (!group.length) { if (myToken === redrawToken) { showEmpty("Ninguna función activa se puede graficar tal como está."); setZoomButtons(false); } return; }
+
+        if (myToken === redrawToken) { showPlot(); plotEl.classList.add("is-loading"); }
+        const notas = [];
+        try {
+        if (has3D) {
+            const rango3DActual = domain3D || view.range;
+            const resolucion3D = Math.round(Math.max(20, Math.min(90, 60 * (rango3DActual / 8))));
+
+            const crudos = await Promise.all(group.map(async (v) => {
+            const safe = toSafeBackendExpr(v.fn.expr);
+            if (v.kind === "implicit") {
+                const datos = await TeoremaAPI.superficie3D(safe, rango3DActual, resolucion3D);
+                if (datos.nota) notas.push(`${v.fn.label}: ${datos.nota}`);
+                return { v, safe, datos };
+            }
+            const datos = await TeoremaAPI.puntos3D(safe, rango3DActual, resolucion3D);
+            return { v, safe, datos };
+            }));
+            if (myToken === redrawToken) notas.forEach(n => TeoremaUI.showToast(n));
+            if (myToken !== redrawToken) return;
+
+            const curvasInterseccion = [];
+            if (crudos.length > 1) {
+            try {
+                const preparadas = crudos.map((c) => {
+                if (c.v.kind === "implicit") {
+                    return { px: c.datos.x, py: c.datos.y, pz: c.datos.z,
+                            triangulos: c.datos.i.map((_, idx) => [c.datos.i[idx], c.datos.j[idx], c.datos.k[idx]]) };
+                }
+                const px = [], py = [], pz = [];
+                c.datos.z.forEach((fila, r) => fila.forEach((zi, col) => {
+                    px.push(c.datos.x[col]); py.push(c.datos.y[r]);
+                    pz.push(typeof zi === "number" && Number.isFinite(zi) ? zi : 1e10);
+                }));
+                return { px, py, pz, triangulos: triangulosDeGrilla(c.datos.z.length, c.datos.z[0].length) };
+                });
+
+                const evaluaciones = await Promise.all(crudos.map(async (c, i) => {
+                const otrosIdx = crudos.map((_, j) => j).filter(j => j !== i);
+                const ecuaciones = otrosIdx.map(j => crudos[j].v.kind === "implicit" ? crudos[j].safe : `(z)-(${crudos[j].safe})`);
+                const resultado = await TeoremaAPI.evaluarEnPuntos(ecuaciones, preparadas[i].px, preparadas[i].py, preparadas[i].pz);
+                const porIndice = {};
+                otrosIdx.forEach((j, k) => { porIndice[j] = resultado.valores[k]; });
+                return porIndice;
+                }));
+
+                for (let i = 0; i < crudos.length; i++) {
+                for (let j = i + 1; j < crudos.length; j++) {
+                    const valoresDeJ = evaluaciones[i][j];
+                    if (!valoresDeJ) continue; 
+                    const segs = segmentosDeInterseccion(preparadas[i].px, preparadas[i].py, preparadas[i].pz, preparadas[i].triangulos, valoresDeJ);
+                    if (segs.length) curvasInterseccion.push({ nombre: `${crudos[i].v.fn.label} ∩ ${crudos[j].v.fn.label}`, segmentos: segs });
+                }
+                }
+            } catch (e) {  }
+            }
+
+            let datosSuperposicion = null;
+            if (mostrarInterseccionVolumen) {
+            const implicitas = crudos.filter(c => c.v.kind === "implicit");
+            if (implicitas.length > 1) {
+                try {
+                const resultado = await TeoremaAPI.interseccion3D(implicitas.map(c => c.safe), rango3DActual, resolucion3D);
+                if (!resultado.vacio && resultado.x.length) {
+                    datosSuperposicion = { datos: resultado, color: colorSuperposicion(implicitas.map(c => c.v.fn.color)) };
+                } else {
+                    TeoremaUI.showToast("Esas superficies no se tocan dentro del rango actual — no hay volumen en común para mostrar.");
+                }
+                } catch (e) {
+                TeoremaUI.showToast(e.message || "No se pudo calcular la superposición.");
+                }
+            }
+            }
+
+            // Si hay intersección calculada, no se dibujan las superficies
+            // implícitas individuales — se ve únicamente el volumen en común.
+            const traces = crudos.filter((c) => !(c.v.kind === "implicit" && datosSuperposicion)).map((c) => {
+            if (c.v.kind === "implicit") {
+                return {
+                type: "mesh3d", x: c.datos.x, y: c.datos.y, z: c.datos.z,
+                i: c.datos.i, j: c.datos.j, k: c.datos.k,
+                name: c.v.fn.label, color: c.v.fn.color, opacity: 1,
+                flatshading: false, lighting: { ambient: 0.55, diffuse: 0.7, specular: 0.15 },
+                };
+            }
+            return {
+                type: "surface", x: c.datos.x, y: c.datos.y, z: c.datos.z,
+                name: c.v.fn.label, showscale: false, opacity: 1,
+                lighting: { ambient: 0.55, diffuse: 0.7, specular: 0.15 },
+                colorscale: [[0, c.v.fn.color], [1, c.v.fn.color]],
+            };
+            });
+            if (datosSuperposicion) {
+            traces.push({
+                type: "mesh3d",
+                x: datosSuperposicion.datos.x, y: datosSuperposicion.datos.y, z: datosSuperposicion.datos.z,
+                i: datosSuperposicion.datos.i, j: datosSuperposicion.datos.j, k: datosSuperposicion.datos.k,
+                name: "En común", color: datosSuperposicion.color, opacity: 1,
+                flatshading: false, lighting: { ambient: 0.55, diffuse: 0.7, specular: 0.15 },
+            });
+            }
+            if (curvasInterseccion.length) {
+            const inkResuelto = colorInk();
+            const nudge = Math.max(rango3DActual * 0.004, 0.01);
+            curvasInterseccion.forEach(({ nombre, segmentos }) => {
+                let segsAUsar = segmentos;
+                const TOPE = 400; 
+                if (segsAUsar.length > TOPE) {
+                const paso = Math.ceil(segsAUsar.length / TOPE);
+                segsAUsar = segsAUsar.filter((_, idx) => idx % paso === 0);
+                }
+                segsAUsar.forEach(([p1, p2], idx) => {
+                const empujar = (p) => {
+                    const dist = Math.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]) || 1;
+                    const f = 1 + nudge / dist;
+                    return [p[0] * f, p[1] * f, p[2] * f];
+                };
+                const q1 = empujar(p1), q2 = empujar(p2);
+                traces.push({
+                    type: "scatter3d", mode: "lines", x: [q1[0], q2[0]], y: [q1[1], q2[1]], z: [q1[2], q2[2]],
+                    name: nombre, legendgroup: nombre, showlegend: idx === 0,
+                    line: { color: inkResuelto, width: 7 }, hoverinfo: "name",
+                });
+                });
+            });
+            }
+            const layout3D = baseLayout3D();
+            layout3D.scene.xaxis.autorange = false; layout3D.scene.xaxis.range = [-rango3DActual, rango3DActual];
+            layout3D.scene.yaxis.autorange = false; layout3D.scene.yaxis.range = [-rango3DActual, rango3DActual];
+            if (group.some(v => v.kind === "implicit")) {
+                layout3D.scene.zaxis.autorange = false; layout3D.scene.zaxis.range = [-rango3DActual, rango3DActual];
+            } 
+            const camaraActual = plotEl.layout && plotEl.layout.scene && plotEl.layout.scene.camera;
+            if (camaraActual) layout3D.scene.camera = camaraActual;
+            Plotly.react(plotEl, traces, layout3D, plotConfig());
+            plotEl.dataset.plotted = "1";
+            attachViewportTracking();
+        } else {
+            const dominioActual = domain2D ? [domain2D.min, domain2D.max] : null;
+            const semiAnchoActual = domain2D ? (domain2D.max - domain2D.min) / 2 : 10;
+            const puntos2D = Math.round(Math.max(500, Math.min(2000, 500 * (semiAnchoActual / 10))));
+            const results = await Promise.all(group.map(v => TeoremaAPI.puntos2D(toSafeBackendExpr(v.fn.expr), dominioActual, puntos2D)));
+            if (myToken !== redrawToken) return;
+            const traces = results.map((datos, i) => ({
+            x: datos.x, y: datos.y, mode: "lines", type: "scatter",
+            name: group[i].fn.label, line: { color: group[i].fn.color, width: 3 },
+            }));
+            const layout2D = baseLayout2D();
+            if (domain2D) {
+            layout2D.xaxis.autorange = false;
+            layout2D.xaxis.range = [domain2D.min, domain2D.max];
+            }
+            const rangoY = calcularRangoY(results.map(r => r.y));
+            if (rangoY) { layout2D.yaxis.autorange = false; layout2D.yaxis.range = rangoY; }
+            Plotly.react(plotEl, traces, layout2D, plotConfig());
+            plotEl.dataset.plotted = "1";
+            attachViewportTracking();
+        }
+        } catch (e) {
+        if (myToken !== redrawToken) return;
+        showEmpty(e.message || "No se pudo graficar la expresión.");
+        TeoremaUI.showToast(e.message || "No se pudo graficar la expresión.", "error");
+        setZoomButtons(false);
+        } finally {
+        if (myToken === redrawToken) plotEl.classList.remove("is-loading");
+        }
+    }
+
+    function baseLayout2D() {
+        return {
+        margin: { t: 20, r: 16, l: 44, b: 40 },
+        // LÍNEAS NEGRAS / GRISES CLARAS
+        xaxis: { title: "x", showgrid: view.grid, visible: view.axes, zeroline: true, autorange: true, gridcolor: "rgba(0,0,0,0.6)", gridwidth: 1, zerolinecolor: "rgba(0,0,0,0.5)", zerolinewidth: 2 },
+        yaxis: { title: "y", showgrid: view.grid, visible: view.axes, zeroline: true, autorange: true, gridcolor: "rgba(0,0,0,0.6)", gridwidth: 1, zerolinecolor: "rgba(0,0,0,0.5)", zerolinewidth: 2 },
+        showlegend: view.legend,
+        legend: { orientation: "h", y: -0.18 },
+        paper_bgcolor: "rgba(0,0,0,0)",
+        plot_bgcolor: "rgba(0,0,0,0)",
+        font: { color: getComputedStyle(document.body).getPropertyValue("--ink") || "#18202f" },
+        };
+    }
+    
+    function baseLayout3D() {
+        // LÍNEAS Y PAREDES NEUTRALES (SIN AZUL)
+        const paredes = {
+        showbackground: view.axes,
+        backgroundcolor: "rgba(240, 244, 248, 0.4)", // Gris azulado extremadamente tenue
+        gridcolor: "rgba(0,0,0,0.6)", // CUADRICULA NEGRA
+        gridwidth: 1,
+        zerolinecolor: "rgba(0,0,0,0.5)", // EJE CERO NEGRO
+        zerolinewidth: 2
+        };
+        return {
+        margin: { t: 20, r: 0, l: 0, b: 0 },
+        showlegend: view.legend,
+        scene: {
+            xaxis: { title: "x", showgrid: view.grid, visible: view.axes, autorange: true, ...paredes },
+            yaxis: { title: "y", showgrid: view.grid, visible: view.axes, autorange: true, ...paredes },
+            zaxis: { title: "z", showgrid: view.grid, visible: view.axes, autorange: true, ...paredes },
+            aspectmode: "cube",
+        },
+        paper_bgcolor: "rgba(0,0,0,0)",
+        font: { color: getComputedStyle(document.body).getPropertyValue("--ink") || "#18202f" },
+        };
+    }
+    
+    function plotConfig() {
+        return {
+        responsive: true,
+        displaylogo: false,
+        modeBarButtonsToRemove: ["lasso2d", "select2d"],
+        toImageButtonOptions: { filename: "grafica-teorema" },
+        scrollZoom: false,
+        };
+    }
+
+    function toggleGrid() { view.grid = !view.grid; applyRelayout(); }
+    function toggleAxes() { view.axes = !view.axes; applyRelayout(); }
+    function toggleLegend() { view.legend = !view.legend; applyRelayout(); }
+    function setRange(r) { view.range = r; domain3D = null; if (functions.some(f => f.visible)) redraw(); }
+    function getRange() { return view.range; }
+    function setGraphMode(mode) { graphMode = mode; if (functions.some(f => f.visible)) redraw(); }
+    function toggleInterseccionVolumen() {
+        mostrarInterseccionVolumen = !mostrarInterseccionVolumen;
+        if (functions.some(f => f.visible)) redraw();
+    }
+    function getGraphMode() { return graphMode; }
+
+    function attachViewportTracking() {
+        if (viewportTrackingAttached || typeof plotEl.on !== "function") return;
+        viewportTrackingAttached = true;
+        let pending = null; 
+        let fastTimer = null;
+
+        function applyFast(xMin, xMax) {
+        const ancho = xMax - xMin;
+        const nuevoMin = xMin - ancho * 0.2, nuevoMax = xMax + ancho * 0.2;
+        const activos2D = functions.filter(f => f.visible && f.expr && f.expr.trim() && TeoremaMath.getGraphKind(f.expr) === "curve");
+        if (!activos2D.length) return true; 
+
+        const xs = new Array(400);
+        for (let i = 0; i < 400; i++) xs[i] = nuevoMin + (i / 399) * (nuevoMax - nuevoMin);
+        const modo = TeoremaCalculator.getMode();
+        const traces = [];
+        for (const fn of activos2D) {
+            const ys = TeoremaMath.sampleCurve(fn.expr, xs, modo);
+            if (!ys) return false; 
+            traces.push({ x: xs, y: ys, mode: "lines", type: "scatter", name: fn.label, line: { color: fn.color, width: 3 } });
+        }
+
+        domain2D = { min: nuevoMin, max: nuevoMax };
+        const layout2D = baseLayout2D();
+        layout2D.xaxis.autorange = false;
+        layout2D.xaxis.range = [nuevoMin, nuevoMax];
+        const rangoY = calcularRangoY(traces.map(t => t.y));
+        if (rangoY) { layout2D.yaxis.autorange = false; layout2D.yaxis.range = rangoY; }
+        Plotly.react(plotEl, traces, layout2D, plotConfig());
+        plotEl.dataset.plotted = "1";
+        return true;
+        }
+
+        plotEl.on("plotly_relayout", (eventData) => {
+        if (!eventData) return;
+
+        if (eventData["xaxis.autorange"]) {
+            domain2D = null;
+            clearTimeout(relayoutTimer);
+            relayoutTimer = setTimeout(() => { if (functions.some(f => f.visible)) redraw(); }, 100);
+            return;
+        }
+
+        const xMin = eventData["xaxis.range[0]"];
+        const xMax = eventData["xaxis.range[1]"];
+        if (typeof xMin !== "number" || typeof xMax !== "number") return;
+
+        pending = [xMin, xMax];
+        if (!fastTimer) {
+            fastTimer = setTimeout(() => {
+            fastTimer = null;
+            const [xm, xM] = pending;
+            const resuelto = applyFast(xm, xM);
+            if (!resuelto) {
+                clearTimeout(relayoutTimer);
+                relayoutTimer = setTimeout(() => {
+                const ancho = xM - xm;
+                domain2D = { min: xm - ancho * 0.25, max: xM + ancho * 0.25 };
+                if (functions.some(f => f.visible)) redraw();
+                }, 350);
+            }
+            }, 16);
+        }
+        });
+    }
+
+    async function resetView() {
+        domain2D = null;
+        domain3D = null;
+        try {
+        await Plotly.relayout(plotEl, {
+            "xaxis.autorange": true, "yaxis.autorange": true,
+            "scene.xaxis.autorange": true, "scene.yaxis.autorange": true, "scene.zaxis.autorange": true,
+            "scene.camera": { eye: { x: 1.25, y: 1.25, z: 1.25 }, center: { x: 0, y: 0, z: 0 }, up: { x: 0, y: 0, z: 1 } },
+        });
+        } catch (e) {  }
+        if (functions.some(f => f.visible)) redraw();
+    }
+
+    function zoomBy(factor) {
+        if (modoActual3D) {
+        const actual = domain3D || view.range;
+        const nuevo = Math.max(1, Math.min(actual * factor, 50)); 
+        if (Math.abs(nuevo - actual) < 0.01) return; 
+        domain3D = nuevo;
+        } else {
+        const actual = domain2D || { min: -10, max: 10 };
+        const centro = (actual.min + actual.max) / 2;
+        const semiAncho = (actual.max - actual.min) / 2;
+        const nuevoSemiAncho = Math.max(0.05, Math.min(semiAncho * factor, 500));
+        if (Math.abs(nuevoSemiAncho - semiAncho) < 0.001) return; 
+        domain2D = { min: centro - nuevoSemiAncho, max: centro + nuevoSemiAncho };
+        }
+        if (functions.some(f => f.visible)) redraw();
+    }
+    function zoomIn() { zoomBy(0.8); }
+    function zoomOut() { zoomBy(1.25); }
+
+    function downloadImage() {
+        Plotly.downloadImage(plotEl, { format: "png", filename: "grafica-teorema", width: 1000, height: 700 }).catch(() => {
+        TeoremaUI.showToast("No se pudo descargar la imagen todavía — dibuja una gráfica primero.");
+        });
+    }
+    function applyRelayout() {
+        if (!plotEl.data) return;
+        Plotly.relayout(plotEl, {
+        "xaxis.showgrid": view.grid, "yaxis.showgrid": view.grid,
+        "xaxis.visible": view.axes, "yaxis.visible": view.axes,
+        "scene.xaxis.showgrid": view.grid, "scene.yaxis.showgrid": view.grid, "scene.zaxis.showgrid": view.grid,
+        "scene.xaxis.visible": view.axes, "scene.yaxis.visible": view.axes, "scene.zaxis.visible": view.axes,
+        "scene.xaxis.showbackground": view.axes, "scene.yaxis.showbackground": view.axes, "scene.zaxis.showbackground": view.axes,
+        showlegend: view.legend,
+        }).catch(() => {});
+    }
+
+    function init(opts) {
+        plotEl = opts.plot; emptyEl = opts.empty; fnListEl = opts.fnList; dimPillEl = opts.dimPill;
+        zoomInEl = opts.zoomIn; zoomOutEl = opts.zoomOut;
+        setZoomButtons(false); 
+        onFunctionsChanged = opts.onFunctionsChanged || onFunctionsChanged;
+        showEmpty();
+        renderList();
+    }
+
+    return {
+        init, addFunction, updateFunction, toggleFunction, removeFunction, redraw,
+        toggleGrid, toggleAxes, toggleLegend, resetView, downloadImage, setRange, getRange,
+        setGraphMode, getGraphMode, zoomIn, zoomOut, toggleInterseccionVolumen,
+        getFunctions: () => functions,
+    };
+    })();
+  </script>
+
+  <script>
+    (function () {
+    "use strict";
+
+    let history = [];
+    let editingFunctionId = null;
+
+    function renderHistory() {
+        TeoremaUI.renderHistory(document.getElementById("historyList"), history, {
+        onReuse: (item) => { 
+            TeoremaGraph.addFunction(item.expresion); 
+            TeoremaUI.showToast("Función restaurada en la gráfica.", "ok");
+        },
+        onEdit: (item) => {
+            TeoremaCalculator.setExpression(item.expresion);
+        },
+        onDelete: (item) => { history = history.filter(h => h !== item); renderHistory(); },
+        });
+    }
+
+    function addHistoryEntry(entry) {
+        if (history.length > 0 && history[history.length - 1].expresion === entry.expresion) return;
+        history.push(entry);
+        renderHistory();
+    }
+
+    function initModals() {
+        document.getElementById("settingsBtn").addEventListener("click", () => TeoremaUI.openModal("settingsModal"));
+        document.getElementById("helpBtn").addEventListener("click", () => TeoremaUI.openModal("helpModal"));
+        document.querySelectorAll("[data-close-modal]").forEach(btn => {
+        btn.addEventListener("click", () => TeoremaUI.closeModal(btn.dataset.closeModal));
+        });
+        document.querySelectorAll(".modal-backdrop").forEach(backdrop => {
+        backdrop.addEventListener("click", (e) => { if (e.target === backdrop) backdrop.classList.remove("open"); });
+        });
+    }
+
+    function initAddFunctionRow() {
+        const input = document.getElementById("newFunctionInput");
+        const btn = document.getElementById("addFunctionBtn");
+        
+        function submit() {
+            const expr = input.value.trim();
+            if (!expr) { TeoremaUI.showToast("Escribe una función antes de agregarla."); return; }
+            const check = TeoremaMath.formatPreviewLatex(expr);
+            if (!check.ok) { TeoremaUI.showToast(check.error); return; }
+            
+            if (editingFunctionId) {
+                TeoremaGraph.updateFunction(editingFunctionId, expr);
+                editingFunctionId = null;
+                btn.textContent = "Agregar";
+            } else {
+                TeoremaGraph.addFunction(expr);
+            }
+
+            addHistoryEntry({
+                expresion: expr,
+                resultado: "", 
+                tipo: "Función",
+                hora: new Date().toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" }),
+            });
+            
+            input.value = "";
+        }
+        
+        btn.addEventListener("click", submit);
+        input.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
+    }
+
+    function initGraphToolbar() {
+        const gridBtn = document.getElementById("toggleGrid");
+        const axesBtn = document.getElementById("toggleAxes");
+        const legendBtn = document.getElementById("toggleLegend");
+        gridBtn.addEventListener("click", () => { gridBtn.classList.toggle("is-active"); TeoremaGraph.toggleGrid(); });
+        axesBtn.addEventListener("click", () => { axesBtn.classList.toggle("is-active"); TeoremaGraph.toggleAxes(); });
+        legendBtn.addEventListener("click", () => { legendBtn.classList.toggle("is-active"); TeoremaGraph.toggleLegend(); });
+        [gridBtn, axesBtn, legendBtn].forEach(b => b.classList.add("is-active"));
+        document.getElementById("resetView").addEventListener("click", () => TeoremaGraph.resetView());
+        document.getElementById("downloadImg").addEventListener("click", () => TeoremaGraph.downloadImage());
+        document.getElementById("zoomInBtn").addEventListener("click", () => TeoremaGraph.zoomIn());
+        document.getElementById("zoomOutBtn").addEventListener("click", () => TeoremaGraph.zoomOut());
+        const interseccionBtn = document.getElementById("toggleInterseccionVol");
+        interseccionBtn.addEventListener("click", () => { interseccionBtn.classList.toggle("is-active"); TeoremaGraph.toggleInterseccionVolumen(); });
+        interseccionBtn.classList.add("is-active"); 
+
+        document.querySelectorAll("#graphModeToggle button").forEach(b => {
+        b.addEventListener("click", () => {
+            document.querySelectorAll("#graphModeToggle button").forEach(x => x.classList.toggle("active", x === b));
+            TeoremaGraph.setGraphMode(b.dataset.graphmode);
+        });
+        });
+    }
+
+    function initCalculator() {
+        TeoremaCalculator.init({
+        input: document.getElementById("calcInput"),
+        preview: document.getElementById("livePreview"),
+        resultBox: document.getElementById("resultBox"),
+        modeButtons: document.getElementById("modeToggle"),
+        onHistoryEntry: addHistoryEntry,
+        });
+        TeoremaUI.renderKeypad(document.getElementById("keypadGroups"), {
+        onInsert: (text, offset) => TeoremaCalculator.insert(text, offset),
+        onAction: (action) => TeoremaCalculator.handleAction(action),
+        });
+        document.getElementById("equalsBtn").addEventListener("click", () => TeoremaCalculator.evaluateNow());
+        document.getElementById("calcInput").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") TeoremaCalculator.evaluateNow();
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        initModals();
+        initGraphToolbar();
+        initAddFunctionRow();
+        TeoremaGraph.init({
+        plot: document.getElementById("plotArea"),
+        empty: document.getElementById("graphEmpty"),
+        fnList: document.getElementById("functionList"),
+        dimPill: document.getElementById("dimPill"),
+        zoomIn: document.getElementById("zoomInBtn"),
+        zoomOut: document.getElementById("zoomOutBtn"),
+        onFunctionsChanged: ({ type, fn }) => {
+            if (type === "edit") {
+            editingFunctionId = fn.id;
+            const input = document.getElementById("newFunctionInput");
+            input.value = fn.expr;
+            input.focus();
+            document.getElementById("addFunctionBtn").textContent = "Guardar";
+            }
+        },
+        });
+        initCalculator();
+        TeoremaUI.initTabs(document.getElementById("sidePanels"));
+        renderHistory();
+    });
+    })();
+  </script>
+  
+  <script>
+    document.getElementById("backBtn").addEventListener("click", () => {
+    location.href = "Menu-Principal.html";
+    });
+    document.getElementById("backendUrlDisplay").textContent = window.BACKEND_URL;
+    document.getElementById("settingsBtn").addEventListener("click", () => {
+      const current = document.querySelector("#modeToggle button.active")?.dataset.mode || "RAD";
+      document.getElementById("modeToggleSettings").querySelectorAll("button").forEach(x => x.classList.toggle("active", x.dataset.mode === current));
+    });
+    document.getElementById("modeToggleSettings").querySelectorAll("button").forEach(b => {
+      b.addEventListener("click", () => {
+        document.getElementById("modeToggle").querySelector(`[data-mode="${b.dataset.mode}"]`).click();
+        document.getElementById("modeToggleSettings").querySelectorAll("button").forEach(x => x.classList.toggle("active", x === b));
+      });
+    });
+    (function initRangeInput() {
+      const rangeInput = document.getElementById("rangeInput");
+      const RANGO_MIN = 0.5, RANGO_MAX = 50;
+      function commitRangeInput() {
+        const bruto = rangeInput.value.trim();
+        const valor = parseFloat(bruto);
+        if (bruto === "" || !Number.isFinite(valor)) {
+          TeoremaUI.showToast("Ingresa un número válido para el rango.", "error");
+          rangeInput.value = TeoremaGraph.getRange();
+          return;
+        }
+        const limitado = Math.max(RANGO_MIN, Math.min(valor, RANGO_MAX));
+        if (limitado !== valor) {
+          TeoremaUI.showToast(`El rango se ajustó a ±${limitado} (el límite permitido es de ${RANGO_MIN} a ${RANGO_MAX}).`, "error");
+        }
+        rangeInput.value = limitado;
+        TeoremaGraph.setRange(limitado);
+      }
+      rangeInput.addEventListener("change", commitRangeInput);
+      rangeInput.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); rangeInput.blur(); } });
+    })();
+  </script>
+</body>
+</html>
