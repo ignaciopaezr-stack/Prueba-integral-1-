@@ -1,3 +1,8 @@
-Flask
+flask
 sympy
-python-dotenv
+reportlab
+matplotlib
+numpy
+pillow
+colorama
+fpdf
