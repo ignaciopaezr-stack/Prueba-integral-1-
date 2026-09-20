@@ -10,3 +10,4 @@ fpdf
 python-dotenv
 fastapi
 uvicorn
+scikit-image
