@@ -7,3 +7,4 @@ numpy
 pillow
 colorama
 fpdf
+python-dotenv
