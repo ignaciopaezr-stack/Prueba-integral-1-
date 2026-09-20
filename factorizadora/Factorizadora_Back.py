@@ -10,7 +10,7 @@ if __name__ == "__main__" al final del archivo).
 """
 
 #Bibliotecas
-
+import os
 from dotenv import load_dotenv
 load_dotenv()
 
