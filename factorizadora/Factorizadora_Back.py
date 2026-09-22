@@ -26,7 +26,7 @@ app = Flask(__name__)
 CORS(app)  #Esto es para permitir que el front-end pueda hacer peticiones a esta API desde otro dominio diferente al front-end.
 
 # Definimos una API Key estática para proteger nuestro backend
-API_KEY_SECRETA = os.getenv("API_SECRET_KEY")
+API_KEY_SECRETA = os.getenv("API_SECRET_KEY", "teorema-api-secure-key-123")
 
 ###############################################################################################################################################
 
