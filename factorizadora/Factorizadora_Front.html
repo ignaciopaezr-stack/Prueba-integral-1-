@@ -692,7 +692,7 @@
         // CONFIGURACIÓN DINÁMICA DEL BACKEND (Local vs Render con prefijo /fac)
         // =========================================================================
         const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-        window.BACKEND_URL = isLocal ? "http://127.0.0.1:8000/fac" : "https://prueba-integral-1.onrender.com/fac";
+        window.BACKEND_URL = window.BACKEND_URL || "https://prueba-integral-1.onrender.com";        
         // =========================================================================
 
         const API_KEY = "teorema-api-secure-key-123";
