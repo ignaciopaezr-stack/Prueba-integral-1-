@@ -249,7 +249,6 @@
             word-break: break-all;
         }
 
-
       .btn-volver {
           display: inline-flex;
           align-items: center;
@@ -292,17 +291,10 @@
       }
 
     </style>
-
-
-
-    
 </head>
 <body>
     <header class="topbar">
         <div class="topbar-left">
-
-
-
             <a href="../index.html" class="btn-volver">
                   <!-- Ícono de flecha SVG -->
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -311,9 +303,6 @@
                   </svg>
                   <span class="btn-texto">Volver al Menú</span>            
             </a>
-
-
-
             <div class="topbar-titles">
                 <h1>Calculadora de Factorización</h1>
                 <p class="subtitle">Módulo de Teorema</p>
@@ -757,8 +746,6 @@
         window.BACKEND_URL = window.BACKEND_URL || "https://prueba-integral-1.onrender.com";
         // =========================================================================
 
-        const API_KEY = "teorema-api-secure-key-123";
-
         const inputPantalla = document.getElementById('pantalla-input');
         const livePreview = document.getElementById('livePreview');
         const textoResultado = document.getElementById('texto-resultado');
@@ -837,8 +824,7 @@
                 const response = await fetch(`${window.BACKEND_URL}/factorizar`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': API_KEY
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ polinomio: paraBackend })
                 });
