@@ -1,4 +1,3 @@
-
 """
 Este backend usa Flask (no FastAPI), así que se activa así, no con
 uvicorn — uvicorn es para apps ASGI y Flask es WSGI:
@@ -9,50 +8,33 @@ Eso ya deja el servidor corriendo en el puerto 5000 (ver el bloque
 if __name__ == "__main__" al final del archivo).
 """
 
-#Bibliotecas
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
 import sympy as sp
-from sympy.parsing.sympy_parser import (parse_expr,standard_transformations,implicit_multiplication_application,convert_xor)
-#Estas son herramientas de traducción como para hacer que 2x sea 2*x, o que 2^3 sea 2**3, etc.
+from sympy.parsing.sympy_parser import (parse_expr, standard_transformations, implicit_multiplication_application, convert_xor)
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-
 app = Flask(__name__)
-CORS(app)  #Esto es para permitir que el front-end pueda hacer peticiones a esta API desde otro dominio diferente al front-end.
 
-# Definimos una API Key estática para proteger nuestro backend
-API_KEY_SECRETA = os.getenv("API_SECRET_KEY", "teorema-api-secure-key-123")
+# Configuración de CORS segura: Solo permite peticiones desde tu GitHub Pages y entornos de prueba locales.
+# Si tu repositorio se llama de otra manera, ajusta la URL en la lista de origins.
+CORS(app, origins=["https://ignaciopaezr-stack.github.io", "http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:5000"])
 
-###############################################################################################################################################
-
-
-#Función para factorizar
-
+# Se elimina la variable API_KEY_SECRETA ya que la seguridad ahora la maneja CORS
 
 def factorizar_api(polinomio):
-    
-    
     if not polinomio or polinomio.strip() == "":
         return {"status":"error", "data":"El polinomio no puede estar vacío."}
     
     try:
-    
-        #Establecemos las reglas de traducción
-        
-        mis_transformaciones= standard_transformations + (implicit_multiplication_application, convert_xor)
-        
-        expresion_limpia=parse_expr(polinomio,transformations=mis_transformaciones)
-        
-        resultado=sp.factor(expresion_limpia, gaussian=True)
-        
-        return {"status":"success", "data":str(resultado)}
-
-        
+        mis_transformaciones = standard_transformations + (implicit_multiplication_application, convert_xor)
+        expresion_limpia = parse_expr(polinomio, transformations=mis_transformaciones)
+        resultado = sp.factor(expresion_limpia, gaussian=True)
+        return {"status":"success", "data": str(resultado)}
         
     except SyntaxError:
         return {"status":"error", "data":"La expresión no es correcta. Revise los paréntesis y operadores."}
@@ -65,30 +47,15 @@ def factorizar_api(polinomio):
 
 
 @app.route('/factorizar', methods=['POST'])
-
 def api_endpoints():
-    client_api_key = request.headers.get("x-api-key")
-
-    if not client_api_key or client_api_key != API_KEY_SECRETA:
-        return (
-            jsonify({
-                "status": "error",
-                "data": "Acceso denegado: API Key inválida o faltante.",
-            }),
-            401,
-        )
-
-    # 2. Procesamiento de datos de entrada
+    # Se elimina la validación que solicitaba el "x-api-key"
+    
     datos = request.get_json()
     polinomio = datos.get("polinomio", "") if datos else ""
 
-    # 3. Llamar a tu lógica de Python
     respuesta = factorizar_api(polinomio)
 
     return jsonify(respuesta)
 
-
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
-        
-##########################################################################################################################################################
