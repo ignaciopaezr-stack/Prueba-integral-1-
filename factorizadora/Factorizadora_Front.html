@@ -743,7 +743,8 @@
         // Mismo patrón que frontend1.html: en desarrollo local apunta a
         // 127.0.0.1; al desplegar, cámbialo por la URL pública del backend,
         // sin barra al final.
-        window.BACKEND_URL = window.BACKEND_URL || "https://prueba-integral-1.onrender.com";
+        const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+        window.BACKEND_URL = isLocal ? "http://127.0.0.1:5000" : "https://prueba-integral-1.onrender.com";
         // =========================================================================
 
         const inputPantalla = document.getElementById('pantalla-input');
@@ -820,14 +821,19 @@
             textoResultado.textContent = 'Calculando...';
             textoResultado.style.color = 'var(--text-light)';
 
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 20000);
+
             try {
                 const response = await fetch(`${window.BACKEND_URL}/factorizar`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ polinomio: paraBackend })
+                    body: JSON.stringify({ polinomio: paraBackend }),
+                    signal: controller.signal
                 });
+                clearTimeout(timeoutId);
 
                 const resultadoJson = await response.json();
 
@@ -850,7 +856,12 @@
                     textoResultado.style.color = 'var(--danger)';
                 }
             } catch (error) {
-                textoResultado.textContent = 'Error de conexión con el servidor Python.';
+                clearTimeout(timeoutId);
+                if (error.name === 'AbortError') {
+                    textoResultado.textContent = 'El servidor está tardando demasiado (puede estar "despertando" tras estar inactivo). Intenta de nuevo en unos segundos.';
+                } else {
+                    textoResultado.textContent = 'Error de conexión con el servidor Python.';
+                }
                 textoResultado.style.color = 'var(--danger)';
             }
         });
